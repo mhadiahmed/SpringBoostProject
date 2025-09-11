@@ -1,0 +1,234 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'maven-publish'
+    id 'signing'
+    id 'org.sonarqube' version '4.4.1.3373'
+}
+
+group = 'com.springboost'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    
+    // JSON Processing
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations'
+    
+    // Database Support  
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    
+    // CLI Support
+    implementation 'info.picocli:picocli:4.7.5'
+    
+    // Utilities
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    implementation 'org.reflections:reflections:0.10.2'
+    
+    // Documentation Processing
+    implementation 'org.jsoup:jsoup:1.17.1'
+    implementation 'org.apache.commons:commons-text:1.11.0'
+    implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
+    
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:h2'
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    
+    // Performance optimizations
+    maxHeapSize = '512m'
+    jvmArgs = ['-XX:MaxMetaspaceSize=256m', '-XX:+UseG1GC']
+    
+    // Exclude slow integration tests by default
+    exclude '**/*IntegrationTest.class'
+    exclude '**/*PerformanceBenchmarkTest.class'
+}
+
+// Task for running integration tests
+task integrationTest(type: Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+    
+    useJUnitPlatform()
+    include '**/*IntegrationTest.class'
+    exclude '**/*PerformanceBenchmarkTest.class'
+    
+    shouldRunAfter test
+}
+
+// Task for running performance tests
+task performanceTest(type: Test) {
+    description = 'Runs performance benchmark tests.'
+    group = 'verification'
+    
+    useJUnitPlatform()
+    include '**/*PerformanceBenchmarkTest.class'
+    
+    shouldRunAfter integrationTest
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            
+            pom {
+                name = 'Spring Boost'
+                description = 'MCP Server for AI-Assisted Spring Boot Development - The Laravel Boost equivalent for Spring Boot developers'
+                url = 'https://github.com/springboost/spring-boost'
+                
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                        distribution = 'repo'
+                    }
+                }
+                
+                developers {
+                    developer {
+                        id = 'springboost-team'
+                        name = 'Spring Boost Development Team'
+                        email = 'dev@springboost.com'
+                        organization = 'Spring Boost'
+                        organizationUrl = 'https://springboost.com'
+                    }
+                }
+                
+                scm {
+                    connection = 'scm:git:git://github.com/springboost/spring-boost.git'
+                    developerConnection = 'scm:git:ssh://github.com/springboost/spring-boost.git'
+                    url = 'https://github.com/springboost/spring-boost/tree/main'
+                }
+                
+                issueManagement {
+                    system = 'GitHub'
+                    url = 'https://github.com/springboost/spring-boost/issues'
+                }
+            }
+        }
+    }
+    
+    repositories {
+        maven {
+            name = 'OSSRH'
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            
+            credentials {
+                username = project.findProperty('ossrhUsername') ?: System.getenv('OSSRH_USERNAME')
+                password = project.findProperty('ossrhPassword') ?: System.getenv('OSSRH_PASSWORD')
+            }
+        }
+    }
+}
+
+signing {
+    required { gradle.taskGraph.hasTask('publish') }
+    
+    def signingKey = project.findProperty('signingKey') ?: System.getenv('SIGNING_KEY')
+    def signingPassword = project.findProperty('signingPassword') ?: System.getenv('SIGNING_PASSWORD')
+    
+    if (signingKey && signingPassword) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.maven
+    }
+}
+
+// Custom tasks for Spring Boost
+task listTools(type: JavaExec) {
+    description = 'List all available MCP tools'
+    group = 'spring-boost'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.springboost.cli.BoostCommand'
+    args = ['--list-tools']
+}
+
+task validateConfig(type: JavaExec) {
+    description = 'Validate Spring Boost configuration'
+    group = 'spring-boost'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.springboost.cli.BoostCommand'
+    args = ['--validate-config']
+}
+
+task startMcpServer(type: JavaExec) {
+    description = 'Start the MCP server'
+    group = 'spring-boost'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.springboost.SpringBoostApplication'
+    systemProperties = [
+        'spring.profiles.active': 'mcp-server'
+    ]
+}
+
+// Fat JAR configuration
+jar {
+    enabled = false
+    dependsOn(bootJar)
+}
+
+bootJar {
+    archiveClassifier = ''
+    manifest {
+        attributes(
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': 'Spring Boost Team',
+            'Main-Class': 'com.springboost.SpringBoostApplication'
+        )
+    }
+}
+
+// Generate application properties at build time
+processResources {
+    doLast {
+        def propsFile = file("${sourceSets.main.output.resourcesDir}/META-INF/spring-boost-build.properties")
+        propsFile.parentFile.mkdirs()
+        propsFile.text = """
+# Auto-generated build information
+spring-boost.build.version=${version}
+spring-boost.build.timestamp=${new Date().format('yyyy-MM-dd HH:mm:ss')}
+spring-boost.build.java-version=${System.getProperty('java.version')}
+spring-boost.build.gradle-version=${gradle.gradleVersion}
+""".trim()
+    }
+}

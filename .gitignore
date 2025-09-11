@@ -114,3 +114,7 @@ node_modules/
 # !.ai/guidelines/*
 embeddings/
 temp/
+!CONTRIBUTING.md
+!CHANGELOG.md
+!installation.md
+!tools.md
