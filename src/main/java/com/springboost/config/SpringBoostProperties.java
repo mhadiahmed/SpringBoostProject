@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Configuration properties for Spring Boost MCP Server
@@ -50,9 +51,32 @@ public class SpringBoostProperties {
     @Data
     public static class DocumentationProperties {
         private boolean enabled = true;
-        private String embeddingsProvider = "local";
+        private String embeddingsProvider = "simple";
         private int cacheSize = 1000;
         private int searchTimeout = 5000;
+        private boolean autoUpdate = false;
+        
+        @NestedConfigurationProperty
+        private Map<String, DocumentationSourceProperties> sources = Map.of();
+        
+        @NestedConfigurationProperty
+        private SearchProperties search = new SearchProperties();
+    }
+    
+    @Data
+    public static class DocumentationSourceProperties {
+        private boolean enabled = true;
+        private String baseUrl;
+        private String version;
+    }
+    
+    @Data
+    public static class SearchProperties {
+        private int defaultMaxResults = 10;
+        private double minRelevanceScore = 0.1;
+        private boolean enableFuzzySearch = true;
+        private boolean enableSemanticSearch = true;
+        private boolean enableKeywordSearch = false;
     }
 
     @Data

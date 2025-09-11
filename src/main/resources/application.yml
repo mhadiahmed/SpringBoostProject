@@ -66,9 +66,29 @@ spring-boost:
   # Documentation Configuration
   documentation:
     enabled: true
-    embeddings-provider: local
+    embeddings-provider: simple
     cache-size: 1000
     search-timeout: 5000
+    auto-update: false
+    sources:
+      spring-boot:
+        enabled: true
+        base-url: "https://docs.spring.io/spring-boot/docs/current/reference/html/"
+        version: "3.2.0"
+      spring-security:
+        enabled: true
+        base-url: "https://docs.spring.io/spring-security/reference/"
+        version: "6.1.0"
+      spring-data:
+        enabled: true
+        base-url: "https://docs.spring.io/spring-data/jpa/docs/current/reference/html/"
+        version: "3.1.0"
+    search:
+      default-max-results: 10
+      min-relevance-score: 0.1
+      enable-fuzzy-search: true
+      enable-semantic-search: true
+      enable-keyword-search: false
   
   # Security Configuration
   security:
