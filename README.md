@@ -2,8 +2,8 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.springboost/spring-boost.svg)](https://search.maven.org/artifact/com.springboost/spring-boost)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/springboost/spring-boost/ci.yml?branch=main)](https://github.com/springboost/spring-boost/actions)
-[![Docker](https://img.shields.io/docker/pulls/springboost/spring-boost.svg)](https://hub.docker.com/r/springboost/spring-boost)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/mhadiahmed/SpringBoostProject/ci.yml?branch=main)](https://github.com/mhadiahmed/SpringBoostProject/actions)
+[![Docker](https://img.shields.io/docker/pulls/mhadiahmed/springboostproject.svg)](https://hub.docker.com/r/mhadiahmed/springboostproject)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
 
@@ -51,7 +51,7 @@ implementation 'com.springboost:spring-boost:1.0.0'
 ### Option 4: Docker
 
 ```bash
-docker run -p 8080:8080 -p 28080:28080 springboost/spring-boost:latest
+docker run -p 8080:8080 -p 28080:28080 mhadiahmed/springboostproject:latest
 ```
 
 ## 🛠️ Available MCP Tools
@@ -167,8 +167,8 @@ Add to your MCP configuration:
 
 ```bash
 # Clone the repository
-git clone https://github.com/springboost/spring-boost.git
-cd spring-boost
+git clone https://github.com/mhadiahmed/SpringBoostProject.git
+cd SpringBoostProject
 
 # Build with Maven
 ./mvnw clean package
@@ -200,7 +200,7 @@ cd spring-boost
 
 ```bash
 # Build image
-docker build -t spring-boost .
+docker build -t springboostproject .
 
 # Run with Docker Compose
 docker-compose up -d
@@ -249,15 +249,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **Website**: [https://springboost.com](https://springboost.com)
-- **Documentation**: [https://docs.springboost.com](https://docs.springboost.com)
-- **GitHub**: [https://github.com/springboost/spring-boost](https://github.com/springboost/spring-boost)
-- **Issues**: [https://github.com/springboost/spring-boost/issues](https://github.com/springboost/spring-boost/issues)
-- **Discussions**: [https://github.com/springboost/spring-boost/discussions](https://github.com/springboost/spring-boost/discussions)
+- **GitHub**: [https://github.com/mhadiahmed/SpringBoostProject](https://github.com/mhadiahmed/SpringBoostProject)
+- **Issues**: [https://github.com/mhadiahmed/SpringBoostProject/issues](https://github.com/mhadiahmed/SpringBoostProject/issues)
+- **Discussions**: [https://github.com/mhadiahmed/SpringBoostProject/discussions](https://github.com/mhadiahmed/SpringBoostProject/discussions)
+- **Documentation**: Available in the [docs/](https://github.com/mhadiahmed/SpringBoostProject/tree/main/docs) directory
 
 ## 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=springboost/spring-boost&type=Date)](https://star-history.com/#springboost/spring-boost&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=mhadiahmed/SpringBoostProject&type=Date)](https://star-history.com/#mhadiahmed/SpringBoostProject&Date)
 
 ---
 

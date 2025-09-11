@@ -98,11 +98,11 @@ install_jar() {
         # For now, we'll build from source since this is initial release
         log_info "Building from source..."
         
-        if [ ! -d "spring-boost" ]; then
-            git clone https://github.com/springboost/spring-boost.git
+        if [ ! -d "SpringBoostProject" ]; then
+            git clone https://github.com/mhadiahmed/SpringBoostProject.git
         fi
         
-        cd spring-boost
+        cd SpringBoostProject
         
         if command -v mvn >/dev/null 2>&1; then
             ./mvnw clean package -DskipTests
@@ -118,7 +118,7 @@ install_jar() {
         cd ..
     else
         # Download specific version
-        download_file "https://github.com/springboost/spring-boost/releases/download/v${VERSION}/spring-boost-${VERSION}.jar" \
+        download_file "https://github.com/mhadiahmed/SpringBoostProject/releases/download/v${VERSION}/spring-boost-${VERSION}.jar" \
                      "$INSTALL_DIR/spring-boost.jar"
     fi
     
@@ -161,7 +161,7 @@ install_docker() {
 version: '3.8'
 services:
   spring-boost:
-    image: springboost/spring-boost:latest
+    image: mhadiahmed/springboostproject:latest
     ports:
       - "8080:8080"
       - "28080:28080"
@@ -310,9 +310,9 @@ main() {
     echo "3. Visit https://docs.springboost.com for documentation"
     echo ""
     echo "Need help? Check out:"
-    echo "  GitHub: https://github.com/springboost/spring-boost"
-    echo "  Docs:   https://docs.springboost.com"
-    echo "  Issues: https://github.com/springboost/spring-boost/issues"
+    echo "  GitHub: https://github.com/mhadiahmed/SpringBoostProject"
+    echo "  Docs:   https://github.com/mhadiahmed/SpringBoostProject/tree/main/docs"
+    echo "  Issues: https://github.com/mhadiahmed/SpringBoostProject/issues"
 }
 
 # Run main function

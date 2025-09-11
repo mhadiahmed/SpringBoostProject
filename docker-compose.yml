@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: springboost/spring-boost:latest
+    image: mhadiahmed/springboostproject:latest
     container_name: spring-boost-mcp
     ports:
       - "8080:8080"     # Application port
