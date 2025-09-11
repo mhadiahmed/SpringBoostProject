@@ -1,6 +1,5 @@
 package com.springboost.mcp.tools;
 
-import com.springboost.mcp.protocol.McpMessage;
 
 import java.util.Map;
 

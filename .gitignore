@@ -110,6 +110,7 @@ coverage/
 node_modules/
 
 # Spring Boost specific
-.ai/cache/
+# .ai/cache/
+# !.ai/guidelines/*
 embeddings/
 temp/
