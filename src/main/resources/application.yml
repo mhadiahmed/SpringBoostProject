@@ -1,0 +1,174 @@
+# Spring Boost Configuration
+spring:
+  application:
+    name: spring-boost
+  
+  # Profile Configuration
+  profiles:
+    active: development
+  
+  # Database Configuration
+  datasource:
+    # Default to H2 for development
+    url: jdbc:h2:mem:springboost;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  # Web Configuration
+  web:
+    resources:
+      add-mappings: true
+  
+  # Actuator Configuration
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: "*"
+        base-path: /actuator
+    endpoint:
+      health:
+        show-details: always
+    info:
+      env:
+        enabled: true
+
+# Spring Boost Specific Configuration
+spring-boost:
+  # MCP Server Configuration
+  mcp:
+    enabled: true
+    port: 8080
+    host: localhost
+    protocol: websocket
+    tools:
+      enabled: true
+      database-access: true
+      code-execution: false
+      endpoint-scanning: true
+      log-access: true
+  
+  # Documentation Configuration
+  documentation:
+    enabled: true
+    embeddings-provider: local
+    cache-size: 1000
+    search-timeout: 5000
+  
+  # Security Configuration
+  security:
+    sandbox-enabled: true
+    allowed-packages: 
+      - "com.springboost"
+      - "org.springframework"
+    restricted-operations:
+      - "file-system-write"
+      - "network-access"
+  
+  # Logging Configuration
+  logging:
+    level: INFO
+    pattern: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file:
+      enabled: false
+      path: logs/spring-boost.log
+
+# Logging Configuration
+logging:
+  level:
+    com.springboost: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    root: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+---
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: development
+  
+  # Development Database (H2)
+  datasource:
+    url: jdbc:h2:mem:springboost_dev;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+
+spring-boost:
+  mcp:
+    tools:
+      code-execution: true
+  security:
+    sandbox-enabled: false
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: production
+  
+  # Production Database (PostgreSQL)
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/springboost}
+    username: ${DATABASE_USERNAME:springboost}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+spring-boost:
+  mcp:
+    tools:
+      code-execution: false
+  security:
+    sandbox-enabled: true
+
+---
+# Test Profile
+spring:
+  config:
+    activate:
+      on-profile: test
+  
+  datasource:
+    url: jdbc:h2:mem:springboost_test;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+spring-boost:
+  mcp:
+    enabled: false
+  documentation:
+    enabled: false
