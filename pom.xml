@@ -12,10 +12,40 @@
     
     <groupId>com.springboost</groupId>
     <artifactId>spring-boost</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>Spring Boost</name>
-    <description>MCP server for AI-assisted Spring Boot development</description>
+    <description>MCP Server for AI-Assisted Spring Boot Development - The Laravel Boost equivalent for Spring Boot developers</description>
     <packaging>jar</packaging>
+    <url>https://github.com/springboost/spring-boost</url>
+    
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <id>springboost-team</id>
+            <name>Spring Boost Development Team</name>
+            <email>dev@springboost.com</email>
+            <organization>Spring Boost</organization>
+            <organizationUrl>https://springboost.com</organizationUrl>
+        </developer>
+    </developers>
+    
+    <scm>
+        <connection>scm:git:git://github.com/springboost/spring-boost.git</connection>
+        <developerConnection>scm:git:ssh://github.com/springboost/spring-boost.git</developerConnection>
+        <url>https://github.com/springboost/spring-boost/tree/main</url>
+    </scm>
+    
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/springboost/spring-boost/issues</url>
+    </issueManagement>
     
     <properties>
         <java.version>17</java.version>
@@ -181,6 +211,13 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- Mockito for unit tests -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-testcontainers</artifactId>
@@ -241,6 +278,55 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
+                <configuration>
+                    <!-- Optimize JVM settings for tests -->
+                    <argLine>-Xmx512m -XX:MaxMetaspaceSize=256m -XX:+UseG1GC</argLine>
+                    <!-- Parallel test execution -->
+                    <parallel>methods</parallel>
+                    <threadCount>2</threadCount>
+                    <!-- Skip slow integration tests by default -->
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*PerformanceBenchmarkTest.java</exclude>
+                    </excludes>
+                    <!-- Include patterns for different test suites -->
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/SmokeTest.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <!-- Fast test profile -->
+                    <execution>
+                        <id>fast-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/SmokeTest.java</include>
+                                <include>**/unit/*Test.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <!-- Integration test profile -->
+                    <execution>
+                        <id>integration-tests</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/*IntegrationTest.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/*PerformanceBenchmarkTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -72,6 +72,11 @@ public class DocumentationManagementTool implements McpTool {
             String source = (String) params.getOrDefault("source", "all");
             boolean includeDetails = (boolean) params.getOrDefault("includeDetails", false);
             
+            // Validate required parameters
+            if (operation == null || operation.trim().isEmpty()) {
+                throw new McpToolException("Operation parameter is required");
+            }
+            
             Map<String, Object> result = new HashMap<>();
             result.put("operation", operation);
             result.put("source", source);

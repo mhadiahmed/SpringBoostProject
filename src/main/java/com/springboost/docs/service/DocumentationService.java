@@ -435,14 +435,19 @@ public class DocumentationService {
      * Generate a unique ID for a document
      */
     private String generateDocumentId(DocumentChunk chunk) {
-        return chunk.getSource() + "-" + chunk.getChecksum().substring(0, 8);
+        String checksum = chunk.getChecksum();
+        // Ensure we have enough characters for substring
+        String shortChecksum = checksum.length() >= 8 ? checksum.substring(0, 8) : checksum;
+        return chunk.getSource() + "-" + shortChecksum;
     }
     
     /**
      * Generate checksum for content
      */
     private String generateChecksum(String content) {
-        return String.valueOf(content.hashCode());
+        // Use absolute value and pad with zeros to ensure consistent length
+        int hash = Math.abs(content.hashCode());
+        return String.format("%08d", hash);
     }
     
     /**
