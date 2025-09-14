@@ -1,6 +1,6 @@
 # Compiled class file
 *.class
-*.md 
+
 .history
 !README.md
 # Log file
@@ -24,7 +24,14 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-
+PHASE1_SUMMARY.md
+PHASE2_SUMMARY.md
+PHASE3_SUMMARY.md
+PHASE4_SUMMARY.md
+PHASE5_SUMMARY.md
+PHASE6_SUMMARY.md
+PHASE7_SUMMARY.md
+SPRING_BOOST_DEVELOPMENT_PLAN.md
 # Maven
 target/
 pom.xml.tag
@@ -110,7 +117,13 @@ coverage/
 node_modules/
 
 # Spring Boost specific
-# .ai/cache/
+!.ai/guidelines/core/*.md
+!.ai/guidelines/ecosystem/*.md
+!.ai/guidelines/spring-boot/*.md
+!.ai/guidelines/spring-cloud/*.md
+!.ai/guidelines/spring-data/*.md
+!.ai/guidelines/spring-security/*.md
+
 # !.ai/guidelines/*
 embeddings/
 temp/
