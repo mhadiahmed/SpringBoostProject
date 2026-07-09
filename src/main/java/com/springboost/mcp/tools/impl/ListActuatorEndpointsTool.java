@@ -51,7 +51,12 @@ public class ListActuatorEndpointsTool implements McpTool {
     public String getCategory() {
         return "monitoring";
     }
-    
+
+    @Override
+    public boolean isCore() {
+        return false; // Spring Boost extension, no Laravel Boost equivalent
+    }
+
     @Override
     public Map<String, Object> getParameterSchema() {
         Map<String, Object> schema = new HashMap<>();

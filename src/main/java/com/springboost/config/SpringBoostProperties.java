@@ -46,6 +46,14 @@ public class SpringBoostProperties {
         private boolean codeExecution = false;
         private boolean endpointScanning = true;
         private boolean logAccess = true;
+
+        /**
+         * Spring Boost tools with no Laravel Boost equivalent (Spring Shell,
+         * List Endpoints, List Actuator Endpoints, Test Execution, Documentation
+         * Management). Off by default so the default tool set matches Boost's
+         * 9 core tools exactly; opt in to get the extra Spring-specific tools.
+         */
+        private boolean extensionsEnabled = false;
     }
 
     @Data

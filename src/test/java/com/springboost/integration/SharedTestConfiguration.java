@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
     "spring.main.banner-mode=off",
     "logging.level.root=WARN",
     "spring-boost.documentation.enabled=false",
+    "spring-boost.mcp.tools.extensions-enabled=true",
     "spring-boot.run.jvmArguments=-Xmx512m"
 })
 public @interface SharedTestConfiguration {

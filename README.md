@@ -11,13 +11,13 @@
 
 ## ✨ Features
 
-- **🔧 15+ MCP Tools** - Specialized tools for Spring Boot development
-- **🧠 AI Guidelines** - Composable AI guidelines for the Spring Boot ecosystem
-- **📚 Documentation API** - Semantic search across Spring Boot documentation
+- **🔧 9 Core MCP Tools** - Exact tool-for-tool parity with Laravel Boost, plus optional Spring-only extensions (off by default)
+- **🧩 Guidelines & Skills** - Always-loaded AI guidelines for broad conventions, on-demand Agent Skills for task-specific patterns — same split Laravel Boost uses
+- **🔌 stdio MCP transport** - Registers with Claude Code / Cursor / Codex / Gemini CLI the same way Boost does (`... mcp`), no persistent server process required
+- **📦 Install/Update CLI** - `spring-boost install` / `spring-boost update` publish guidelines & skills into your project, mirroring `artisan boost:install` / `boost:update`
+- **📚 Documentation Search** - Local semantic search over the bundled Spring guideline corpus (not a hosted service — see [Documentation Search](#-documentation-search) below)
 - **🗄️ Database Integration** - Direct database interaction and schema inspection
 - **🎯 Application Context** - Deep Spring application inspection capabilities
-- **⚡ Performance Optimized** - Lightning-fast responses with intelligent caching
-- **🐳 Docker Ready** - Containerized deployment support
 - **🔒 Security First** - Sandboxed execution with configurable permissions
 
 ## 🚀 Quick Start
@@ -56,22 +56,53 @@ docker run -p 8080:8080 -p 28080:28080 mhadiahmed/springboostproject:latest
 
 ## 🛠️ Available MCP Tools
 
-| Tool | Description | Category |
-|------|-------------|----------|
-| **Application Info** | Read Spring Boot version, profiles, beans, and configuration | Application |
-| **Database Connections** | Inspect DataSource configurations and connection pools | Database |
-| **Database Schema** | Read database schema and JPA entity mappings | Database |
-| **Database Query** | Execute SELECT queries against the database | Database |
-| **List Endpoints** | Inspect REST endpoints and their mappings | Web |
-| **Get Absolute URL** | Convert relative paths to absolute URLs | Web |
-| **Last Error** | Read the last error from application logs | Logging |
-| **Read Log Entries** | Read last N log entries with filtering | Logging |
-| **Browser Logs** | Read browser console logs and errors | Monitoring |
-| **Spring Shell** | Execute code within Spring application context (Tinker equivalent) | Execution |
-| **Search Docs** | Query Spring documentation with semantic search | Documentation |
-| **List Actuator Endpoints** | Inspect available Actuator endpoints | Monitoring |
-| **Test Execution** | Run and analyze test results | Testing |
-| **Documentation Management** | Manage documentation sources and stats | Documentation |
+### Core (enabled by default — exact Laravel Boost parity)
+
+| Tool | Notes |
+|------|-------|
+| **Application Info** | Read Spring Boot version, profiles, beans, and configuration |
+| **Browser Logs** | Read logs and errors from the browser |
+| **Database Connections** | Inspect available DataSource configurations, including the default connection |
+| **Database Query** | Execute a SELECT query against the database |
+| **Database Schema** | Read the database schema and JPA entity mappings |
+| **Get Absolute URL** | Convert relative path URIs to absolute so agents generate valid URLs |
+| **Last Error** | Read the last error from the application's log files |
+| **Read Log Entries** | Read the last N log entries |
+| **Search Docs** | Query the local, guideline-backed documentation search |
+
+### Extensions (opt-in, no Boost equivalent)
+
+Disabled by default so the out-of-the-box tool set matches Boost's 9 tools
+exactly. Enable with `spring-boost.mcp.tools.extensions-enabled: true`.
+
+| Tool | Description |
+|------|-------------|
+| **Spring Shell** | Execute SpEL expressions within the Spring application context (Tinker-style) |
+| **List Endpoints** | Inspect REST endpoints and their mappings |
+| **List Actuator Endpoints** | Inspect available Actuator endpoints |
+| **Test Execution** | Run and analyze test results |
+| **Documentation Management** | Manage documentation sources and stats |
+
+## 🧩 Guidelines vs. Skills
+
+Same split Laravel Boost uses:
+
+| | Guidelines (`.ai/guidelines/`) | Skills (`.ai/skills/*/SKILL.md`) |
+|---|---|---|
+| **Loaded** | Upfront, always present | On-demand, when relevant to the task |
+| **Scope** | Broad, foundational conventions per framework/version | Focused, task-specific patterns |
+| **Examples** | `core/spring-security.md`, `spring-boot/3.x/core.md` | `spring-data-jpa-development`, `testcontainers-testing`, `mcp-development` |
+
+Run `spring-boost install` to publish both into your project's `.ai/` directory.
+
+## 📚 Documentation Search
+
+The `Search Docs` tool searches the AI guidelines bundled with Spring Boost —
+a local corpus, not a hosted service. Laravel Boost's `Search Docs` queries a
+Laravel-maintained hosted API covering 17,000+ real documentation entries
+across the Laravel ecosystem; there's no Spring equivalent of that
+infrastructure, so this project can't claim byte-for-byte parity there. The
+local guideline search is the honest substitute.
 
 ## 🎯 Use Cases
 
@@ -102,11 +133,10 @@ Create `application.yml` in your Spring Boot project:
 spring-boost:
   mcp:
     enabled: true
-    port: 28080
-    host: localhost
     tools:
       database-access: true
-      code-execution: false  # Enable with caution
+      code-execution: false   # Enable with caution
+      extensions-enabled: false # Opt in to the 5 Spring-only tools beyond Boost parity
   documentation:
     enabled: true
     embeddings-provider: openai  # or 'mock' for development
@@ -117,40 +147,50 @@ spring-boost:
       allowed-packages: ["com.example"]
 ```
 
-## 🔌 AI Client Setup
+## 📦 Install & Update
 
-### Cursor IDE
+From your Spring Boot project's root:
 
-Add to your `.cursorrules` or workspace settings:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "spring-boost": {
-        "command": "java",
-        "args": ["-jar", "spring-boost.jar"],
-        "transport": "websocket",
-        "url": "ws://localhost:28080"
-      }
-    }
-  }
-}
+```bash
+java -jar spring-boost.jar install   # publish .ai/guidelines + .ai/skills, print editor setup
+java -jar spring-boost.jar update    # refresh already-published guidelines/skills
+java -jar spring-boost.jar update --discover  # also publish any newly-added ones
 ```
 
-### Claude Desktop
+`install` skips files you've already customized unless you pass `--force`.
 
-Add to your MCP configuration:
+## 🔌 AI Client Setup
+
+Spring Boost runs as a **stdio** MCP server — one process per editor session,
+spawned on demand — exactly like Laravel Boost's `php artisan boost:mcp`. No
+persistent server or open port required.
+
+### Claude Code
+
+```bash
+claude mcp add -s local -t stdio spring-boost -- java -jar spring-boost.jar mcp
+```
+
+### Codex
+
+```bash
+codex mcp add spring-boost -- java -jar spring-boost.jar mcp
+```
+
+### Gemini CLI
+
+```bash
+gemini mcp add -s project -t stdio spring-boost java -jar spring-boost.jar mcp
+```
+
+### Cursor / manual registration
 
 ```json
 {
   "mcpServers": {
     "spring-boost": {
-      "command": "spring-boost",
-      "transport": {
-        "type": "websocket",
-        "url": "ws://localhost:28080"
-      }
+      "command": "java",
+      "args": ["-jar", "spring-boost.jar", "mcp"]
     }
   }
 }
@@ -226,6 +266,7 @@ docker-compose logs -f spring-boost
 - [x] **Phase 5**: Documentation API with semantic search
 - [x] **Phase 6**: Integration testing and optimization
 - [x] **Phase 7**: Distribution and packaging
+- [x] **Phase 8**: Laravel Boost architectural parity — stdio transport, core/extension tool split, Guidelines vs. Skills, install/update CLI
 
 ## 🤝 Contributing
 

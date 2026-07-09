@@ -69,6 +69,18 @@ java {
     withJavadocJar()
 }
 
+// Bundle the AI guidelines/skills into the jar so `install`/`update` can
+// publish them into a consumer project, exactly like Laravel Boost ships
+// its guidelines/skills inside the Composer package.
+sourceSets {
+    main {
+        resources {
+            srcDir rootDir
+            include '.ai/guidelines/**', '.ai/skills/**'
+        }
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
     

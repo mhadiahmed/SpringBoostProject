@@ -36,7 +36,12 @@ public class DocumentationManagementTool implements McpTool {
     public String getCategory() {
         return "documentation";
     }
-    
+
+    @Override
+    public boolean isCore() {
+        return false; // Spring Boost extension, no Laravel Boost equivalent
+    }
+
     @Override
     public Map<String, Object> getParameterSchema() {
         Map<String, Object> schema = new HashMap<>();

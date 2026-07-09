@@ -1,6 +1,8 @@
 package com.springboost.cli;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboost.config.SpringBoostProperties;
+import com.springboost.mcp.McpMessageProcessor;
 import com.springboost.mcp.tools.McpToolRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,22 +55,36 @@ public class BoostCommand implements Callable<Integer>, CommandLineRunner {
     
     @Autowired
     private McpToolRegistry toolRegistry;
-    
+
     @Autowired
     private SpringBoostProperties properties;
-    
+
     @Autowired
     private ApplicationContext applicationContext;
-    
+
+    @Autowired
+    private McpMessageProcessor messageProcessor;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private GuidelinesPublisher guidelinesPublisher;
+
     @Override
     public void run(String... args) throws Exception {
-        // Only run CLI if we have command line arguments
+        // Only run CLI if we have command line arguments; with none, this is the
+        // long-running server (WebSocket, port 8080/28080) and should keep running.
         if (args.length > 0) {
             CommandLine cmd = new CommandLine(this);
+            cmd.addSubcommand("mcp", new McpSubcommand(messageProcessor, objectMapper));
+            cmd.addSubcommand("install", new InstallSubcommand(guidelinesPublisher));
+            cmd.addSubcommand("update", new UpdateSubcommand(guidelinesPublisher));
             int exitCode = cmd.execute(args);
-            if (exitCode != 0) {
-                SpringApplication.exit(applicationContext, () -> exitCode);
-            }
+            // Always exit after a CLI subcommand/flag runs -- otherwise the app
+            // keeps running (with a full web server for non-headless commands)
+            // even after --list-tools/--validate-config/install/update finish.
+            SpringApplication.exit(applicationContext, () -> exitCode);
         }
     }
     
@@ -95,30 +111,42 @@ public class BoostCommand implements Callable<Integer>, CommandLineRunner {
     private int listAvailableTools() {
         System.out.println("\n🛠️  Available Spring Boost MCP Tools:");
         System.out.println("==========================================");
-        
+
         var tools = toolRegistry.getAllTools();
         if (tools.isEmpty()) {
             System.out.println("No tools available.");
             return 0;
         }
-        
-        // Group tools by category
-        var toolsByCategory = tools.stream()
+
+        var coreTools = tools.stream().filter(com.springboost.mcp.tools.McpTool::isCore).toList();
+        var extensionTools = tools.stream().filter(t -> !t.isCore()).toList();
+
+        System.out.printf("\n%s CORE (Laravel Boost parity — %d tools):\n", "🎯", coreTools.size());
+        printToolsByCategory(coreTools);
+
+        if (!extensionTools.isEmpty()) {
+            System.out.printf("\n%s EXTENSIONS (Spring-specific, no Boost equivalent — %d tools):\n", "🧩", extensionTools.size());
+            printToolsByCategory(extensionTools);
+        } else {
+            System.out.println("\n🧩 EXTENSIONS: disabled (set spring-boost.mcp.tools.extensions-enabled=true to enable)");
+        }
+
+        System.out.printf("\nTotal enabled: %d tool(s)\n", tools.size());
+        return 0;
+    }
+
+    private void printToolsByCategory(java.util.List<com.springboost.mcp.tools.McpTool> toolsToPrint) {
+        var toolsByCategory = toolsToPrint.stream()
                 .collect(java.util.stream.Collectors.groupingBy(
                     com.springboost.mcp.tools.McpTool::getCategory
                 ));
-        
+
         toolsByCategory.forEach((category, categoryTools) -> {
             System.out.printf("\n📂 %s:\n", category.toUpperCase());
             categoryTools.forEach(tool -> {
-                System.out.printf("  • %-20s - %s\n", tool.getName(), tool.getDescription());
+                System.out.printf("  • %-25s - %s\n", tool.getName(), tool.getDescription());
             });
         });
-        
-        System.out.printf("\nTotal: %d tools across %d categories\n", 
-                tools.size(), toolsByCategory.size());
-        
-        return 0;
     }
     
     private int validateConfiguration() {

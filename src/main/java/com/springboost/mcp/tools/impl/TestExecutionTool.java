@@ -69,7 +69,12 @@ public class TestExecutionTool implements McpTool {
     public String getCategory() {
         return "testing";
     }
-    
+
+    @Override
+    public boolean isCore() {
+        return false; // Spring Boost extension, no Laravel Boost equivalent
+    }
+
     @Override
     public boolean requiresElevatedPrivileges() {
         return true; // Test execution may require system access

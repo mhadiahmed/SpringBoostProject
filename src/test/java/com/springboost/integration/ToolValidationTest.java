@@ -36,8 +36,17 @@ class ToolValidationTest {
 
     // Expected tool categories
     private static final Set<String> VALID_CATEGORIES = Set.of(
-            "application", "database", "web", "logging", "documentation", 
+            "application", "database", "web", "logging", "documentation",
             "testing", "monitoring", "security", "development"
+    );
+
+    // Tools whose execute() has real side effects when called with empty/default
+    // params (test-execution shells out to run the whole build; spring-shell runs
+    // arbitrary SpEL) -- blindly invoking them here would recursively re-run this
+    // very test suite. Their schemas/properties are still covered by the other
+    // tests in this class; only blind execute() calls are skipped.
+    private static final Set<String> UNSAFE_TO_BLIND_EXECUTE = Set.of(
+            "test-execution", "spring-shell"
     );
 
     @BeforeEach
@@ -139,6 +148,9 @@ class ToolValidationTest {
     @Order(4)
     void testToolExecutionWithEmptyParameters() {
         for (McpTool tool : availableTools) {
+            if (UNSAFE_TO_BLIND_EXECUTE.contains(tool.getName())) {
+                continue;
+            }
             try {
                 Object result = tool.execute(Map.of());
                 // Tool should either succeed or throw a meaningful exception
@@ -162,6 +174,9 @@ class ToolValidationTest {
     @Order(5)
     void testToolExecutionWithNullParameters() {
         for (McpTool tool : availableTools) {
+            if (UNSAFE_TO_BLIND_EXECUTE.contains(tool.getName())) {
+                continue;
+            }
             assertThrows(Exception.class, () -> {
                 tool.execute(null);
             }, "Tool '" + tool.getName() + "' should handle null parameters gracefully");
@@ -283,6 +298,9 @@ class ToolValidationTest {
     @Order(10)
     void testToolErrorMessagesQuality() {
         for (McpTool tool : availableTools) {
+            if (UNSAFE_TO_BLIND_EXECUTE.contains(tool.getName())) {
+                continue;
+            }
             try {
                 // Try to execute with obviously invalid parameters
                 Map<String, Object> invalidParams = Map.of(

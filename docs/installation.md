@@ -75,25 +75,21 @@ Add Spring Boost as a dependency to your existing Spring Boot project:
 </dependencies>
 ```
 
-#### Configuration
+#### Register the MCP server (stdio)
 
-Add to your `application.yml`:
-
-```yaml
-spring-boost:
-  mcp:
-    enabled: true
-    port: 28080
-    host: localhost
-```
-
-#### Run Your Application
+Spring Boost registers as a stdio-transport MCP server — one process per
+editor session, spawned on demand, no port to open:
 
 ```bash
-mvn spring-boot:run
+claude mcp add -s local -t stdio spring-boost -- java -jar spring-boost.jar mcp
 ```
 
-The MCP server will be available at `ws://localhost:28080`
+See [AI Client Setup](../README.md#-ai-client-setup) in the README for Codex,
+Gemini CLI, and Cursor equivalents. Then publish the AI guidelines/skills:
+
+```bash
+java -jar spring-boost.jar install
+```
 
 ### 4. Gradle Dependency
 
@@ -318,26 +314,20 @@ export SPRING_PROFILES_ACTIVE=development
 ### Check Installation
 
 ```bash
-# Check if Spring Boost is accessible
-curl http://localhost:8080/actuator/health
+# List available tools (core vs extensions)
+java -jar spring-boost.jar --list-tools
 
-# List available tools
-curl http://localhost:8080/actuator/springboost/tools
+# Validate configuration
+java -jar spring-boost.jar --validate-config
 
-# Test MCP connection
-wscat -c ws://localhost:28080
+# Confirm the stdio MCP transport starts (Ctrl+C to exit)
+java -jar spring-boost.jar mcp
 ```
 
-### Test MCP Tools
-
-```bash
-# Using spring-boost CLI
-spring-boost --list-tools
-spring-boost --validate-config
-
-# Test a specific tool
-spring-boost --tool application-info
-```
+If you're also running the full application (Docker/Maven/Gradle modes),
+`/actuator/health` and the WebSocket endpoint remain available for that
+always-on mode — but editor integration should use the `mcp` stdio
+subcommand above, not the WebSocket transport.
 
 ## Troubleshooting
 

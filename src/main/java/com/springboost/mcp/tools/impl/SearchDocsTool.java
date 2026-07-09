@@ -61,14 +61,12 @@ public class SearchDocsTool implements McpTool {
                 "version", Map.of(
                         "type", "string",
                         "description", "Documentation version to search",
-                        "enum", Arrays.asList("3.2.0", "6.1.0", "3.1.0"),
-                        "default", null
+                        "enum", Arrays.asList("3.2.0", "6.1.0", "3.1.0")
                 ),
                 "category", Map.of(
                         "type", "string",
                         "description", "Documentation category to search",
-                        "enum", Arrays.asList("core", "security", "data", "web", "testing", "configuration"),
-                        "default", null
+                        "enum", Arrays.asList("core", "security", "data", "web", "testing", "configuration")
                 ),
                 "includeCode", Map.of(
                         "type", "boolean",

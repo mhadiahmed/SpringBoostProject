@@ -52,6 +52,18 @@ public interface McpTool {
     default String getCategory() {
         return "general";
     }
+
+    /**
+     * Whether this tool is part of the core Laravel Boost-parity tool set
+     * (Application Info, Database Connections/Schema/Query, Get Absolute URL,
+     * Last Error, Read Log Entries, Browser Logs, Search Docs) as opposed to
+     * a Spring-specific extension with no Boost equivalent. Extensions are
+     * disabled by default; see spring-boost.mcp.tools.extensions-enabled.
+     * @return true if this tool is one of the 9 Boost-parity core tools
+     */
+    default boolean isCore() {
+        return true;
+    }
     
     /**
      * Check if this tool requires elevated privileges

@@ -82,7 +82,12 @@ public class SpringShellTool implements McpTool {
     public String getCategory() {
         return "execution";
     }
-    
+
+    @Override
+    public boolean isCore() {
+        return false; // Spring Boost extension, no Laravel Boost equivalent
+    }
+
     @Override
     public boolean requiresElevatedPrivileges() {
         return true; // Code execution requires elevated privileges

@@ -1,22 +1,27 @@
 # Tool Reference
 
-Spring Boost provides 15+ specialized MCP tools designed to accelerate AI-assisted Spring Boot development. Each tool provides specific functionality to help AI understand and work with your Spring Boot application.
+Spring Boost ships 9 **core** MCP tools with exact tool-for-tool parity to
+[Laravel Boost](https://github.com/laravel/boost), plus 5 **extension** tools
+specific to Spring that have no Boost equivalent. Extensions are disabled by
+default (`spring-boost.mcp.tools.extensions-enabled: false`) so the
+out-of-the-box tool set matches Boost exactly; enable them if you want the
+extra Spring-specific capabilities.
 
 ## Tool Categories
 
-- **[Application](#application-tools)** - Application information and configuration
-- **[Database](#database-tools)** - Database inspection and querying
-- **[Web](#web-tools)** - Web layer and endpoint management
-- **[Logging](#logging-tools)** - Log analysis and error tracking
-- **[Monitoring](#monitoring-tools)** - Application health and metrics
-- **[Execution](#execution-tools)** - Code execution and testing
-- **[Documentation](#documentation-tools)** - Documentation search and management
+- **[Application](#application-tools)** - Application information and configuration *(core)*
+- **[Database](#database-tools)** - Database inspection and querying *(core)*
+- **[Web](#web-tools)** - Web layer and endpoint management *(mixed — see below)*
+- **[Logging](#logging-tools)** - Log analysis and error tracking *(core)*
+- **[Monitoring](#monitoring-tools)** - Application health and metrics *(mixed — see below)*
+- **[Execution](#execution-tools)** - Code execution and testing *(extension)*
+- **[Documentation](#documentation-tools)** - Documentation search and management *(mixed — see below)*
 
 ---
 
 ## Application Tools
 
-### Application Info Tool
+### Application Info Tool *(core)*
 
 **Name**: `application-info`  
 **Description**: Provides comprehensive information about the Spring Boot application
@@ -52,7 +57,7 @@ None required.
 
 ## Database Tools
 
-### Database Connections Tool
+### Database Connections Tool *(core)*
 
 **Name**: `database-connections`  
 **Description**: Inspects DataSource configurations and connection pool information
@@ -84,7 +89,7 @@ None required.
 - Performance optimization
 - Understanding data source configuration
 
-### Database Schema Tool
+### Database Schema Tool *(core)*
 
 **Name**: `database-schema`  
 **Description**: Reads database schema and JPA entity mappings
@@ -132,7 +137,7 @@ None required.
 - Entity relationship mapping
 - Database migration planning
 
-### Database Query Tool
+### Database Query Tool *(core)*
 
 **Name**: `database-query`  
 **Description**: Executes safe SELECT queries against the database
@@ -173,7 +178,7 @@ None required.
 
 ## Web Tools
 
-### List Endpoints Tool
+### List Endpoints Tool *(extension — no Boost equivalent)*
 
 **Name**: `list-endpoints`  
 **Description**: Inspects REST endpoints and their mappings
@@ -210,7 +215,7 @@ None required.
 - Endpoint testing and validation
 - Security configuration review
 
-### Get Absolute URL Tool
+### Get Absolute URL Tool *(core)*
 
 **Name**: `get-absolute-url`  
 **Description**: Converts relative paths to absolute URLs
@@ -243,7 +248,7 @@ None required.
 
 ## Logging Tools
 
-### Last Error Tool
+### Last Error Tool *(core)*
 
 **Name**: `last-error`  
 **Description**: Reads the last error from application log files
@@ -276,7 +281,7 @@ None required.
 - Understanding application failures
 - Debugging production issues
 
-### Read Log Entries Tool
+### Read Log Entries Tool *(core)*
 
 **Name**: `read-log-entries`  
 **Description**: Reads recent log entries with filtering capabilities
@@ -308,7 +313,7 @@ None required.
 
 ## Monitoring Tools
 
-### Browser Logs Tool
+### Browser Logs Tool *(core)*
 
 **Name**: `browser-logs`  
 **Description**: Collects and analyzes browser console logs and errors
@@ -339,7 +344,7 @@ None required.
 }
 ```
 
-### List Actuator Endpoints Tool
+### List Actuator Endpoints Tool *(extension — no Boost equivalent)*
 
 **Name**: `list-actuator-endpoints`  
 **Description**: Lists available Spring Boot Actuator endpoints
@@ -380,7 +385,7 @@ None required.
 
 ## Execution Tools
 
-### Spring Shell Tool (Tinker Equivalent)
+### Spring Shell Tool (Tinker Equivalent) *(extension — no Boost equivalent)*
 
 **Name**: `spring-shell`  
 **Description**: Executes code within the Spring application context
@@ -416,7 +421,7 @@ None required.
 - Expression validation
 - Timeout protection
 
-### Test Execution Tool
+### Test Execution Tool *(extension — no Boost equivalent)*
 
 **Name**: `test-execution`  
 **Description**: Runs Spring Boot tests and analyzes results
@@ -455,10 +460,10 @@ None required.
 
 ## Documentation Tools
 
-### Search Docs Tool
+### Search Docs Tool *(core)*
 
 **Name**: `search-docs`  
-**Description**: Performs semantic search across Spring Boot documentation
+**Description**: Performs semantic search across the local Spring Boost AI guideline corpus (not a hosted API — see the README's Documentation Search section)
 
 #### Parameters
 - `query` (string, required): Search query
@@ -493,7 +498,7 @@ None required.
 }
 ```
 
-### Documentation Management Tool
+### Documentation Management Tool *(extension — no Boost equivalent)*
 
 **Name**: `documentation-management`  
 **Description**: Manages documentation sources and provides statistics

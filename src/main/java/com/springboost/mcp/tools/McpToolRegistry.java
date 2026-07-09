@@ -139,7 +139,13 @@ public class McpToolRegistry {
         if (!properties.getMcp().getTools().isEnabled()) {
             return false;
         }
-        
+
+        // Non-core (Spring Boost-only) tools are opt-in so the default tool
+        // set matches Laravel Boost's 9 core tools exactly.
+        if (!tool.isCore() && !properties.getMcp().getTools().isExtensionsEnabled()) {
+            return false;
+        }
+
         // Tool-specific checks based on configuration
         String toolName = tool.getName();
         String category = tool.getCategory();
