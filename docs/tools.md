@@ -42,7 +42,7 @@ None required.
   "beans": ["applicationInfoTool", "dataSource", "userController"],
   "endpoints": 15,
   "buildInfo": {
-    "version": "1.0.0-SNAPSHOT",
+    "version": "0.1.0",
     "time": "2024-01-15T10:30:00Z"
   }
 }

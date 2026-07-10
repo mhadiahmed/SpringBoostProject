@@ -36,7 +36,7 @@ gradle clean build
 gradle clean build -x test
 ```
 
-This produces `target/spring-boost-1.0.0-SNAPSHOT.jar` — a self-contained executable jar.
+This produces `target/spring-boost-0.1.0.jar` — a self-contained executable jar.
 
 ## Register the MCP Server (stdio)
 
@@ -45,7 +45,7 @@ editor session, spawned on demand, no port to open. From your Spring Boot
 project's root:
 
 ```bash
-java -jar /path/to/spring-boost-1.0.0-SNAPSHOT.jar install
+java -jar /path/to/spring-boost-0.1.0.jar install
 ```
 
 `install` publishes the AI guidelines/skills into your project's `.ai/`
@@ -53,7 +53,7 @@ directory and prints the exact registration command for your editor. For
 Claude Code specifically:
 
 ```bash
-claude mcp add -s local -t stdio spring-boost -- java -jar /path/to/spring-boost-1.0.0-SNAPSHOT.jar mcp
+claude mcp add -s local -t stdio spring-boost -- java -jar /path/to/spring-boost-0.1.0.jar mcp
 ```
 
 See [AI Client Setup](../README.md#-ai-client-setup) in the README for Codex, Gemini CLI, and Cursor equivalents.
@@ -66,7 +66,7 @@ integration above:
 
 ```bash
 # Run directly
-java -jar target/spring-boost-1.0.0-SNAPSHOT.jar
+java -jar target/spring-boost-0.1.0.jar
 
 # Or build and run in Docker
 docker build -t spring-boost .

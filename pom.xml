@@ -10,14 +10,17 @@
         <relativePath/>
     </parent>
     
-    <groupId>com.springboost</groupId>
+    <!-- Group ID uses the io.github.<username> convention Sonatype's Central
+         Portal verifies automatically via GitHub, since we don't own the
+         springboost.com domain that com.springboost would require. -->
+    <groupId>io.github.mhadiahmed</groupId>
     <artifactId>spring-boost</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>Spring Boost</name>
     <description>MCP Server for AI-Assisted Spring Boot Development - The Laravel Boost equivalent for Spring Boot developers</description>
     <packaging>jar</packaging>
-    <url>https://github.com/springboost/spring-boost</url>
-    
+    <url>https://github.com/mhadiahmed/SpringBoostProject</url>
+
     <licenses>
         <license>
             <name>MIT License</name>
@@ -25,26 +28,25 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
+
     <developers>
         <developer>
-            <id>springboost-team</id>
-            <name>Spring Boost Development Team</name>
-            <email>dev@springboost.com</email>
-            <organization>Spring Boost</organization>
-            <organizationUrl>https://springboost.com</organizationUrl>
+            <id>mhadiahmed</id>
+            <name>Mhadi Ahmed</name>
+            <email>m.mhadi@xsquare.sa</email>
+            <url>https://github.com/mhadiahmed</url>
         </developer>
     </developers>
-    
+
     <scm>
-        <connection>scm:git:git://github.com/springboost/spring-boost.git</connection>
-        <developerConnection>scm:git:ssh://github.com/springboost/spring-boost.git</developerConnection>
-        <url>https://github.com/springboost/spring-boost/tree/main</url>
+        <connection>scm:git:git://github.com/mhadiahmed/SpringBoostProject.git</connection>
+        <developerConnection>scm:git:ssh://github.com/mhadiahmed/SpringBoostProject.git</developerConnection>
+        <url>https://github.com/mhadiahmed/SpringBoostProject/tree/main</url>
     </scm>
-    
+
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/springboost/spring-boost/issues</url>
+        <url>https://github.com/mhadiahmed/SpringBoostProject/issues</url>
     </issueManagement>
     
     <properties>
@@ -400,46 +402,27 @@
                 </executions>
             </plugin>
             
-            <!-- Nexus Staging Plugin -->
+            <!-- Central Portal Publishing Plugin: new namespace registrations
+                 (io.github.mhadiahmed has never been published before) go
+                 through central.sonatype.com's Central Portal, not the
+                 legacy OSSRH/Nexus staging host. Requires a <server> entry
+                 with id "central" in ~/.m2/settings.xml holding a Sonatype
+                 user token (generated from the Central Portal UI after
+                 creating an account and verifying this namespace), plus a
+                 GPG key for the maven-gpg-plugin above. -->
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-            
-            <!-- Maven Release Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.1</version>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release</releaseProfiles>
-                    <goals>deploy</goals>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-    
-    <!-- Distribution Management -->
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-    
+
     <!-- Profiles -->
     <profiles>
         <profile>

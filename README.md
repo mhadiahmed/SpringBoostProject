@@ -30,10 +30,10 @@ cd SpringBoostProject
 mvn clean package -DskipTests
 ```
 
-This produces `target/spring-boost-1.0.0-SNAPSHOT.jar`. Then, from your Spring Boot project's root, publish the AI guidelines/skills and register the MCP server:
+This produces `target/spring-boost-0.1.0.jar`. Then, from your Spring Boot project's root, publish the AI guidelines/skills and register the MCP server:
 
 ```bash
-java -jar /path/to/spring-boost-1.0.0-SNAPSHOT.jar install
+java -jar /path/to/spring-boost-0.1.0.jar install
 ```
 
 `install` prints the exact registration command for your editor (Claude Code, Cursor, Codex, Gemini CLI) — see [AI Client Setup](#-ai-client-setup) below.
@@ -206,7 +206,7 @@ gradle build
 mvn test
 
 # Run the long-running WebSocket server (no args = default server mode)
-java -jar target/spring-boost-1.0.0-SNAPSHOT.jar
+java -jar target/spring-boost-0.1.0.jar
 ```
 
 ### Running Tests
