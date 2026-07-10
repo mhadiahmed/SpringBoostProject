@@ -39,7 +39,7 @@ public class SpringBoostApplication {
         System.setProperty("spring.banner.location", "classpath:banner.txt");
 
         String subcommand = args.length > 0 ? args[0] : null;
-        boolean headless = HEADLESS_COMMANDS.contains(subcommand);
+        boolean headless = subcommand != null && HEADLESS_COMMANDS.contains(subcommand);
 
         if ("mcp".equals(subcommand)) {
             // Keep stdout pristine for JSON-RPC framing; everything else goes to stderr.
