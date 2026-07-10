@@ -1,11 +1,12 @@
 # 🚀 Spring Boost
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.mhadiahmed/spring-boost.svg)](https://central.sonatype.com/artifact/io.github.mhadiahmed/spring-boost)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/mhadiahmed/SpringBoostProject/ci.yml?branch=main)](https://github.com/mhadiahmed/SpringBoostProject/actions)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
 
-> Not yet published to Maven Central or Docker Hub — download the jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases) or build from source (see below).
+> Published on Maven Central as `io.github.mhadiahmed:spring-boost`. Not yet on Docker Hub — download the jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases), pull from Maven Central (see below), or build from source.
 
 **The Laravel Boost equivalent for Spring Boot developers** - An MCP (Model Context Protocol) server that accelerates AI-assisted Spring Boot development by providing essential context and specialized tools that AI needs to generate high-quality, framework-specific code.
 
@@ -48,6 +49,22 @@ java -jar /path/to/spring-boost-0.1.0.jar install
 ```
 
 `install` prints the exact registration command for your editor (Claude Code, Cursor, Codex, Gemini CLI) — see [AI Client Setup](#-ai-client-setup) below.
+
+### Option 3: Maven/Gradle dependency
+
+If you want to embed the long-running WebSocket server mode inside your own Spring Boot application rather than run the standalone jar:
+
+```xml
+<dependency>
+    <groupId>io.github.mhadiahmed</groupId>
+    <artifactId>spring-boost</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+```gradle
+implementation 'io.github.mhadiahmed:spring-boost:0.1.0'
+```
 
 ## 🛠️ Available MCP Tools
 
