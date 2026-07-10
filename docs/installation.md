@@ -8,7 +8,7 @@ This guide covers all the different ways to install and run Spring Boost in your
 - **Maven 3.6+** or **Gradle 7+** - Build tools (no wrapper is committed yet, so a system install of one of these is required)
 - **Git** - For cloning the repository
 
-> Spring Boost isn't published to Maven Central or Docker Hub yet — build from source below. A packaged release is planned; check the [GitHub Releases page](https://github.com/mhadiahmed/SpringBoostProject/releases) for pre-built jars once available.
+> Spring Boost isn't published to Maven Central or Docker Hub yet. Download the pre-built jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases) or build from source below.
 
 ## Building from Source
 

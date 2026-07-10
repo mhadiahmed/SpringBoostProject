@@ -5,7 +5,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
 
-> Not yet published to Maven Central or Docker Hub — build from source for now (see below). A packaged release is planned.
+> Not yet published to Maven Central or Docker Hub — download the jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases) or build from source (see below).
 
 **The Laravel Boost equivalent for Spring Boot developers** - An MCP (Model Context Protocol) server that accelerates AI-assisted Spring Boot development by providing essential context and specialized tools that AI needs to generate high-quality, framework-specific code.
 
@@ -22,7 +22,14 @@
 
 ## 🚀 Quick Start
 
-Build the jar from source (requires Java 17+ and Maven):
+### Option 1: Download the release jar
+
+```bash
+curl -L -o spring-boost.jar \
+  https://github.com/mhadiahmed/SpringBoostProject/releases/download/v0.1.0/spring-boost-0.1.0.jar
+```
+
+### Option 2: Build from source (requires Java 17+ and Maven)
 
 ```bash
 git clone https://github.com/mhadiahmed/SpringBoostProject.git
@@ -30,7 +37,11 @@ cd SpringBoostProject
 mvn clean package -DskipTests
 ```
 
-This produces `target/spring-boost-0.1.0.jar`. Then, from your Spring Boot project's root, publish the AI guidelines/skills and register the MCP server:
+This produces `target/spring-boost-0.1.0.jar`.
+
+### Then, from your Spring Boot project's root
+
+Publish the AI guidelines/skills and get your editor's registration command:
 
 ```bash
 java -jar /path/to/spring-boost-0.1.0.jar install
