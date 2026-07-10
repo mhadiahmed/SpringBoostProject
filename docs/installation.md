@@ -5,216 +5,72 @@ This guide covers all the different ways to install and run Spring Boost in your
 ## Prerequisites
 
 - **Java 17 or higher** - Spring Boot 3.x requirement
-- **Maven 3.6+** or **Gradle 7+** - Build tools
+- **Maven 3.6+** or **Gradle 7+** - Build tools (no wrapper is committed yet, so a system install of one of these is required)
 - **Git** - For cloning the repository
-- **curl** or **wget** - For script downloads
 
-## Installation Methods
+> Spring Boost isn't published to Maven Central or Docker Hub yet — build from source below. A packaged release is planned; check the [GitHub Releases page](https://github.com/mhadiahmed/SpringBoostProject/releases) for pre-built jars once available.
 
-### 1. One-Line Installation (Recommended)
-
-The easiest way to get started:
-
-```bash
-curl -sSL https://install.springboost.com | bash
-```
-
-Or with options:
-```bash
-curl -sSL https://install.springboost.com | bash -s -- --method jar --version latest
-```
-
-### 2. Manual JAR Installation
-
-#### Download and Install
-
-```bash
-# Create installation directory
-mkdir -p ~/.spring-boost
-
-# Download latest release (replace VERSION with actual version)
-curl -L -o ~/.spring-boost/spring-boost.jar \
-  https://github.com/springboost/spring-boost/releases/download/v1.0.0/spring-boost-1.0.0.jar
-
-# Create executable wrapper
-cat > ~/.spring-boost/spring-boost << 'EOF'
-#!/bin/bash
-SPRING_BOOST_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec java -jar "$SPRING_BOOST_HOME/spring-boost.jar" "$@"
-EOF
-
-chmod +x ~/.spring-boost/spring-boost
-
-# Add to PATH
-echo 'export PATH="$HOME/.spring-boost:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-#### Verify Installation
-
-```bash
-spring-boost --version
-spring-boost --list-tools
-```
-
-### 3. Maven Dependency
-
-Add Spring Boost as a dependency to your existing Spring Boot project:
-
-#### Add to pom.xml
-
-```xml
-<dependencies>
-    <!-- Your existing dependencies -->
-    
-    <dependency>
-        <groupId>com.springboost</groupId>
-        <artifactId>spring-boost</artifactId>
-        <version>1.0.0</version>
-    </dependency>
-</dependencies>
-```
-
-#### Register the MCP server (stdio)
-
-Spring Boost registers as a stdio-transport MCP server — one process per
-editor session, spawned on demand, no port to open:
-
-```bash
-claude mcp add -s local -t stdio spring-boost -- java -jar spring-boost.jar mcp
-```
-
-See [AI Client Setup](../README.md#-ai-client-setup) in the README for Codex,
-Gemini CLI, and Cursor equivalents. Then publish the AI guidelines/skills:
-
-```bash
-java -jar spring-boost.jar install
-```
-
-### 4. Gradle Dependency
-
-Add Spring Boost to your Gradle project:
-
-#### Add to build.gradle
-
-```gradle
-dependencies {
-    implementation 'com.springboost:spring-boost:1.0.0'
-    // Your other dependencies
-}
-```
-
-#### Configuration
-
-Same as Maven - add configuration to `application.yml`.
-
-#### Run Your Application
-
-```bash
-./gradlew bootRun
-```
-
-### 5. Docker Installation
-
-#### Quick Start with Docker
-
-```bash
-# Run with default settings
-docker run -p 8080:8080 -p 28080:28080 springboost/spring-boost:latest
-
-# Run with custom configuration
-docker run -p 8080:8080 -p 28080:28080 \
-  -e SPRING_PROFILES_ACTIVE=production \
-  -e SPRING_BOOST_MCP_PORT=28080 \
-  -v $(pwd)/config:/app/config \
-  springboost/spring-boost:latest
-```
-
-#### Using Docker Compose
-
-Create `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  spring-boost:
-    image: springboost/spring-boost:latest
-    ports:
-      - "8080:8080"
-      - "28080:28080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=production
-      - SPRING_BOOST_MCP_ENABLED=true
-    volumes:
-      - spring-boost-data:/app/data
-    restart: unless-stopped
-
-volumes:
-  spring-boost-data:
-```
-
-Run with:
-```bash
-docker-compose up -d
-```
-
-#### Custom Docker Build
-
-If you want to build from source:
-
-```bash
-git clone https://github.com/springboost/spring-boost.git
-cd spring-boost
-docker build -t my-spring-boost .
-docker run -p 8080:8080 -p 28080:28080 my-spring-boost
-```
-
-### 6. Building from Source
+## Building from Source
 
 #### Clone the Repository
 
 ```bash
-git clone https://github.com/springboost/spring-boost.git
-cd spring-boost
+git clone https://github.com/mhadiahmed/SpringBoostProject.git
+cd SpringBoostProject
 ```
 
 #### Build with Maven
 
 ```bash
 # Clean and build
-./mvnw clean package
+mvn clean package
 
 # Skip tests for faster build
-./mvnw clean package -DskipTests
-
-# Run the application
-./mvnw spring-boot:run
+mvn clean package -DskipTests
 ```
 
-#### Build with Gradle
+#### Build with Gradle (if installed)
 
 ```bash
-# Clean and build
-./gradlew clean build
-
-# Skip tests for faster build
-./gradlew clean build -x test
-
-# Run the application
-./gradlew bootRun
+gradle clean build
+gradle clean build -x test
 ```
 
-#### Development Mode
+This produces `target/spring-boost-1.0.0-SNAPSHOT.jar` — a self-contained executable jar.
 
-For development with auto-reload:
+## Register the MCP Server (stdio)
+
+Spring Boost registers as a stdio-transport MCP server — one process per
+editor session, spawned on demand, no port to open. From your Spring Boot
+project's root:
 
 ```bash
-# Maven
-./mvnw spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.devtools.restart.enabled=true"
+java -jar /path/to/spring-boost-1.0.0-SNAPSHOT.jar install
+```
 
-# Gradle
-./gradlew bootRun --continuous
+`install` publishes the AI guidelines/skills into your project's `.ai/`
+directory and prints the exact registration command for your editor. For
+Claude Code specifically:
+
+```bash
+claude mcp add -s local -t stdio spring-boost -- java -jar /path/to/spring-boost-1.0.0-SNAPSHOT.jar mcp
+```
+
+See [AI Client Setup](../README.md#-ai-client-setup) in the README for Codex, Gemini CLI, and Cursor equivalents.
+
+## Running the Long-Running Server (optional)
+
+Spring Boost can also run as an always-on WebSocket server (e.g. inside
+Docker or as a dependency in your own app), separate from the stdio
+integration above:
+
+```bash
+# Run directly
+java -jar target/spring-boost-1.0.0-SNAPSHOT.jar
+
+# Or build and run in Docker
+docker build -t spring-boost .
+docker run -p 8080:8080 -p 28080:28080 spring-boost
 ```
 
 ## Configuration
@@ -376,8 +232,8 @@ If you encounter issues:
 1. **Check the logs**: `logs/spring-boost.log`
 2. **Validate configuration**: `spring-boost --validate-config`
 3. **Check system requirements**: Java 17+, available ports
-4. **Search existing issues**: [GitHub Issues](https://github.com/springboost/spring-boost/issues)
-5. **Ask for help**: [GitHub Discussions](https://github.com/springboost/spring-boost/discussions)
+4. **Search existing issues**: [GitHub Issues](https://github.com/mhadiahmed/SpringBoostProject/issues)
+5. **Ask for help**: [GitHub Discussions](https://github.com/mhadiahmed/SpringBoostProject/discussions)
 
 ## Next Steps
 
@@ -386,4 +242,4 @@ After installation:
 1. **Configure your AI client** - See [AI Client Setup](ai-clients.md)
 2. **Explore available tools** - See [Tool Reference](tools.md)
 3. **Configure for your project** - See [Configuration Guide](configuration.md)
-4. **Join the community** - [GitHub Discussions](https://github.com/springboost/spring-boost/discussions)
+4. **Join the community** - [GitHub Discussions](https://github.com/mhadiahmed/SpringBoostProject/discussions)

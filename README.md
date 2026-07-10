@@ -1,11 +1,11 @@
 # 🚀 Spring Boost
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.springboost/spring-boost.svg)](https://search.maven.org/artifact/com.springboost/spring-boost)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/mhadiahmed/SpringBoostProject/ci.yml?branch=main)](https://github.com/mhadiahmed/SpringBoostProject/actions)
-[![Docker](https://img.shields.io/docker/pulls/mhadiahmed/springboostproject.svg)](https://hub.docker.com/r/mhadiahmed/springboostproject)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
+
+> Not yet published to Maven Central or Docker Hub — build from source for now (see below). A packaged release is planned.
 
 **The Laravel Boost equivalent for Spring Boot developers** - An MCP (Model Context Protocol) server that accelerates AI-assisted Spring Boot development by providing essential context and specialized tools that AI needs to generate high-quality, framework-specific code.
 
@@ -22,37 +22,21 @@
 
 ## 🚀 Quick Start
 
-### Option 1: One-Line Install (Recommended)
+Build the jar from source (requires Java 17+ and Maven):
 
 ```bash
-curl -sSL https://install.springboost.com | bash
+git clone https://github.com/mhadiahmed/SpringBoostProject.git
+cd SpringBoostProject
+mvn clean package -DskipTests
 ```
 
-### Option 2: Maven Dependency
-
-Add to your `pom.xml`:
-
-```xml
-<dependency>
-    <groupId>com.springboost</groupId>
-    <artifactId>spring-boost</artifactId>
-    <version>1.0.0</version>
-</dependency>
-```
-
-### Option 3: Gradle Dependency
-
-Add to your `build.gradle`:
-
-```gradle
-implementation 'com.springboost:spring-boost:1.0.0'
-```
-
-### Option 4: Docker
+This produces `target/spring-boost-1.0.0-SNAPSHOT.jar`. Then, from your Spring Boot project's root, publish the AI guidelines/skills and register the MCP server:
 
 ```bash
-docker run -p 8080:8080 -p 28080:28080 mhadiahmed/springboostproject:latest
+java -jar /path/to/spring-boost-1.0.0-SNAPSHOT.jar install
 ```
+
+`install` prints the exact registration command for your editor (Claude Code, Cursor, Codex, Gemini CLI) — see [AI Client Setup](#-ai-client-setup) below.
 
 ## 🛠️ Available MCP Tools
 
@@ -205,35 +189,37 @@ gemini mcp add -s project -t stdio spring-boost java -jar spring-boost.jar mcp
 
 ### Building from Source
 
+No Maven/Gradle wrapper is committed to this repo yet, so use a system-installed Maven or Gradle:
+
 ```bash
 # Clone the repository
 git clone https://github.com/mhadiahmed/SpringBoostProject.git
 cd SpringBoostProject
 
 # Build with Maven
-./mvnw clean package
+mvn clean package
 
-# Or build with Gradle
-./gradlew build
+# Or build with Gradle (if installed)
+gradle build
 
 # Run tests
-./mvnw test
+mvn test
 
-# Run the application
-./mvnw spring-boot:run
+# Run the long-running WebSocket server (no args = default server mode)
+java -jar target/spring-boost-1.0.0-SNAPSHOT.jar
 ```
 
 ### Running Tests
 
 ```bash
 # Fast tests only (recommended for development)
-./mvnw test
+mvn test
 
 # Include integration tests
-./mvnw test -Dtest="**/*IntegrationTest"
+mvn test -Dtest="**/*IntegrationTest"
 
 # All tests including performance benchmarks
-./mvnw verify
+mvn verify
 ```
 
 ## 🐳 Docker Development
