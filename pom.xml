@@ -315,9 +315,12 @@
                         <exclude>**/*IntegrationTest.java</exclude>
                         <exclude>**/*PerformanceBenchmarkTest.java</exclude>
                     </excludes>
-                    <!-- Include patterns for different test suites -->
+                    <!-- Include patterns for different test suites. Both suffixes matter:
+                         SpringBoostApplicationTests.java (plural) silently never ran under
+                         just **/*Test.java until this was added. -->
                     <includes>
                         <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
                         <include>**/SmokeTest.java</include>
                     </includes>
                 </configuration>

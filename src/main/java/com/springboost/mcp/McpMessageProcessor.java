@@ -88,7 +88,7 @@ public class McpMessageProcessor {
         result.put("protocolVersion", clientProtocolVersion != null ? clientProtocolVersion : FALLBACK_PROTOCOL_VERSION);
         result.put("serverInfo", Map.of(
                 "name", "spring-boost",
-                "version", "0.1.0"
+                "version", com.springboost.SpringBoostApplication.getVersion()
         ));
         result.put("capabilities", Map.of(
                 "tools", Map.of("listChanged", true),

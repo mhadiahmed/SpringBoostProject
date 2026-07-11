@@ -51,6 +51,18 @@ public class SpringBoostApplication {
         currentMode = Mode.IN_PROCESS;
     }
 
+    /**
+     * Reads the real build version from the jar manifest's
+     * Implementation-Version (set automatically by the Maven/Gradle build
+     * from the project version), so reported version numbers can't drift
+     * from the actual released artifact the way three separate hardcoded
+     * "0.1.0" literals once did across an entire release.
+     */
+    public static String getVersion() {
+        String version = SpringBoostApplication.class.getPackage().getImplementationVersion();
+        return version != null ? version : "dev";
+    }
+
     public static void main(String[] args) throws Exception {
         if (args.length > 0 && "mcp".equals(args[0])) {
             // Fast path: skip Spring entirely. Delegates straight to the

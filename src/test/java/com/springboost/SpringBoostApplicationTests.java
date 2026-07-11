@@ -35,8 +35,16 @@ class SpringBoostApplicationTests {
         // Test basic execution of the ApplicationInfoTool
         var tool = toolRegistry.getTool("application-info");
         assertThat(tool).isPresent();
-        
+
         var result = tool.get().execute(java.util.Map.of());
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    void getVersionNeverReturnsNullEvenWithoutAJarManifest() {
+        // Running from test classes (not a packaged jar) has no
+        // Implementation-Version manifest entry -- must fall back, not NPE,
+        // since this backs every serverInfo.version reported over MCP.
+        assertThat(SpringBoostApplication.getVersion()).isNotNull();
     }
 }

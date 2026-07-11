@@ -1,6 +1,7 @@
 package com.springboost.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springboost.SpringBoostApplication;
 import com.springboost.config.SpringBoostProperties;
 import com.springboost.mcp.McpMessageProcessor;
 import com.springboost.mcp.tools.McpToolRegistry;
@@ -23,9 +24,17 @@ import java.util.concurrent.Callable;
     name = "spring-boost",
     description = "Spring Boost MCP Server for AI-assisted development",
     mixinStandardHelpOptions = true,
-    version = "0.1.0"
+    versionProvider = BoostCommand.VersionProvider.class
 )
 public class BoostCommand implements Callable<Integer>, CommandLineRunner {
+
+    /** Reads the real build version instead of a hardcoded annotation literal that drifts on every release. */
+    static class VersionProvider implements CommandLine.IVersionProvider {
+        @Override
+        public String[] getVersion() {
+            return new String[] { SpringBoostApplication.getVersion() };
+        }
+    }
     
     @CommandLine.Option(
         names = {"-p", "--port"},
@@ -206,7 +215,7 @@ public class BoostCommand implements Callable<Integer>, CommandLineRunner {
     private int showServerInfo() {
         System.out.println("\n🚀 Spring Boost MCP Server");
         System.out.println("==========================");
-        System.out.printf("Version: 0.1.0\n");
+        System.out.printf("Version: %s\n", SpringBoostApplication.getVersion());
         System.out.printf("Status: %s\n", properties.getMcp().isEnabled() ? "Running" : "Stopped");
         System.out.printf("Endpoint: ws://%s:%d/mcp\n", 
                 properties.getMcp().getHost(), 

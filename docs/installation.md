@@ -95,7 +95,7 @@ spring-boost:
       code-execution: false
   documentation:
     enabled: true
-    embeddings-provider: mock  # or 'openai' for production
+    embeddings-provider: simple  # the only real implementation right now; 'openai'/'local' are unimplemented stubs
     cache-size: 1000
     search-timeout: 30s
     auto-update: true
@@ -118,7 +118,7 @@ spring-boost:
     tools:
       code-execution: true  # Enable for development
   documentation:
-    embeddings-provider: mock
+    embeddings-provider: simple
   security:
     sandbox:
       enabled: false  # Relaxed for development
@@ -132,7 +132,7 @@ spring-boost:
     tools:
       code-execution: false  # Disabled for security
   documentation:
-    embeddings-provider: openai
+    embeddings-provider: simple  # 'openai' is an unimplemented stub -- see docs/usage.md
     cache-size: 5000
   security:
     sandbox:

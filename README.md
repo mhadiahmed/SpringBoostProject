@@ -6,7 +6,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
 
-> Published on Maven Central as `io.github.mhadiahmed:spring-boost`. Not yet on Docker Hub — download the jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases), pull from Maven Central (see below), or build from source.
+> Published on Maven Central as `io.github.mhadiahmed:spring-boost` (current: **v0.2.0**). Not yet on Docker Hub/GHCR — download the jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases), pull from Maven Central (see below), or build from source. See [docs/usage.md](docs/usage.md) for a full walkthrough.
 
 **The Laravel Boost equivalent for Spring Boot developers** - An MCP (Model Context Protocol) server that accelerates AI-assisted Spring Boot development by providing essential context and specialized tools that AI needs to generate high-quality, framework-specific code.
 
@@ -22,6 +22,11 @@
 - **🔒 Security First** - Sandboxed execution with configurable permissions
 
 ## 🚀 Quick Start
+
+> ⚠️ The GitHub Releases page currently only has **v0.1.0**, which has known
+> bugs fixed in v0.2.0 (see [KNOWN_ISSUES.md](KNOWN_ISSUES.md)) — don't use
+> it. Until a v0.2.0 GitHub Release exists, build from source (Option 2) or
+> pull straight from Maven Central (Option 3, for embedding).
 
 ### Option 1: Download the release jar
 
@@ -163,7 +168,7 @@ spring-boost:
       extensions-enabled: false # Opt in to the 5 Spring-only tools beyond Boost parity
   documentation:
     enabled: true
-    embeddings-provider: openai  # or 'mock' for development
+    embeddings-provider: simple  # only real option — 'openai'/'local' are unimplemented stubs, see docs/usage.md
     cache-size: 1000
   security:
     sandbox:
@@ -188,6 +193,14 @@ java -jar spring-boost.jar update --discover  # also publish any newly-added one
 Spring Boost runs as a **stdio** MCP server — one process per editor session,
 spawned on demand — exactly like Laravel Boost's `php artisan boost:mcp`. No
 persistent server or open port required.
+
+Under the hood, `mcp` connects to a small shared background daemon (auto-started
+on first use, one per machine) that keeps the Spring context warm instead of
+paying full JVM+Spring boot on every session. The **first** connection after a
+reboot (or after the daemon hasn't run in a while) takes a few seconds while
+it starts; every connection after that is near-instant. This is transparent —
+nothing to configure — but explains why the very first `claude mcp get` (or
+equivalent) can be slower than the rest.
 
 ### Claude Code
 
@@ -265,23 +278,20 @@ mvn verify
 ## 🐳 Docker Development
 
 ```bash
-# Build image
+# Build image (verified this pass — arm64/Apple Silicon compatible)
 docker build -t springboostproject .
-
-# Run with Docker Compose
-docker-compose up -d
-
-# View logs
-docker-compose logs -f spring-boost
 ```
+
+`docker-compose.yml` also exists for running the long-lived server with a
+real Postgres, but isn't independently re-verified this pass — check it
+matches your setup (ports, `SPRING_DATASOURCE_URL`, etc.) before relying on it.
 
 ## 📖 Documentation
 
-- **[Installation Guide](docs/installation.md)** - Detailed installation instructions
+- **[Usage Guide](docs/usage.md)** - Full walkthrough: install, register, use, configure, troubleshoot
+- **[Installation Guide](docs/installation.md)** - Build-from-source and registration details
 - **[Tool Reference](docs/tools.md)** - Complete tool documentation
-- **[Configuration Guide](docs/configuration.md)** - Configuration options
-- **[AI Guidelines](docs/guidelines.md)** - AI-specific guidelines
-- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
+- **[Known Issues](KNOWN_ISSUES.md)** - What's genuinely fixed vs. still open, with how each was verified
 
 ## 🔧 Development Roadmap
 
@@ -293,6 +303,8 @@ docker-compose logs -f spring-boost
 - [x] **Phase 6**: Integration testing and optimization
 - [x] **Phase 7**: Distribution and packaging
 - [x] **Phase 8**: Laravel Boost architectural parity — stdio transport, core/extension tool split, Guidelines vs. Skills, install/update CLI
+- [x] **Phase 9**: Real MCP connection reliability (root-caused a JSON-RPC envelope bug, not just speed) and working app embedding (`IN_PROCESS` mode) — see [KNOWN_ISSUES.md](KNOWN_ISSUES.md)
+- [ ] **Next up**: CLI boot-noise cleanup, smaller jar (currently ~107MB), daemon lifecycle commands (`status`/`stop`), Windows verification — see [Recommendations](docs/usage.md#recommended-next-steps) in the usage guide
 
 ## 🤝 Contributing
 

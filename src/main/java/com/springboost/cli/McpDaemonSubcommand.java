@@ -49,8 +49,9 @@ public class McpDaemonSubcommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         DaemonPaths.ensureHomeExists();
+        String key = DaemonPaths.currentIdentityKey();
 
-        FileChannel lockChannel = FileChannel.open(DaemonPaths.LOCK_FILE,
+        FileChannel lockChannel = FileChannel.open(DaemonPaths.lockFile(key),
                 StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         FileLock lock = lockChannel.tryLock();
         if (lock == null) {
@@ -63,7 +64,7 @@ public class McpDaemonSubcommand implements Callable<Integer> {
 
         try (ServerSocket serverSocket = new ServerSocket(0, 50, InetAddress.getLoopbackAddress())) {
             int port = serverSocket.getLocalPort();
-            Files.writeString(DaemonPaths.PORT_FILE, String.valueOf(port),
+            Files.writeString(DaemonPaths.portFile(key), String.valueOf(port),
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             log.info("spring-boost MCP daemon listening on 127.0.0.1:{}", port);
 

@@ -127,7 +127,7 @@ public class McpServer implements WebSocketHandler {
         try {
             Map<String, Object> welcomeData = new HashMap<>();
             welcomeData.put("serverName", "Spring Boost MCP Server");
-            welcomeData.put("version", "0.1.0");
+            welcomeData.put("version", com.springboost.SpringBoostApplication.getVersion());
             welcomeData.put("availableTools", toolRegistry.getToolNames().size());
             welcomeData.put("timestamp", System.currentTimeMillis());
             

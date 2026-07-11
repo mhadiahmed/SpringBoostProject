@@ -35,11 +35,12 @@ public final class ThinLauncher {
 
     public static void main(String[] args) throws Exception {
         DaemonPaths.ensureHomeExists();
+        String key = DaemonPaths.currentIdentityKey();
 
-        Socket socket = connectIfRunning();
+        Socket socket = connectIfRunning(key);
         if (socket == null) {
-            maybeSpawnDaemon();
-            socket = waitForDaemon();
+            maybeSpawnDaemon(key);
+            socket = waitForDaemon(key);
         }
         if (socket == null) {
             System.err.println("[spring-boost] Timed out waiting for the spring-boost daemon to start.");
@@ -49,8 +50,8 @@ public final class ThinLauncher {
         relay(socket);
     }
 
-    private static Socket connectIfRunning() {
-        Integer port = readPort();
+    private static Socket connectIfRunning(String key) {
+        Integer port = readPort(key);
         if (port == null) {
             return null;
         }
@@ -63,17 +64,17 @@ public final class ThinLauncher {
         }
     }
 
-    private static Integer readPort() {
+    private static Integer readPort(String key) {
         try {
-            List<String> lines = Files.readAllLines(DaemonPaths.PORT_FILE, StandardCharsets.UTF_8);
+            List<String> lines = Files.readAllLines(DaemonPaths.portFile(key), StandardCharsets.UTF_8);
             return lines.isEmpty() ? null : Integer.parseInt(lines.get(0).trim());
         } catch (Exception e) {
             return null;
         }
     }
 
-    private static void maybeSpawnDaemon() throws IOException {
-        try (FileChannel channel = FileChannel.open(DaemonPaths.LOCK_FILE,
+    private static void maybeSpawnDaemon(String key) throws IOException {
+        try (FileChannel channel = FileChannel.open(DaemonPaths.lockFile(key),
                 StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             FileLock lock = channel.tryLock();
             if (lock == null) {
@@ -89,8 +90,9 @@ public final class ThinLauncher {
 
         List<String> command = buildRelaunchCommand();
         ProcessBuilder pb = new ProcessBuilder(command);
-        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(DaemonPaths.LOG_FILE.toFile()));
-        pb.redirectError(ProcessBuilder.Redirect.appendTo(DaemonPaths.LOG_FILE.toFile()));
+        File logFile = DaemonPaths.logFile(key).toFile();
+        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
+        pb.redirectError(ProcessBuilder.Redirect.appendTo(logFile));
         pb.redirectInput(ProcessBuilder.Redirect.from(new File(isWindows() ? "NUL" : "/dev/null")));
         pb.start();
     }
@@ -105,7 +107,7 @@ public final class ThinLauncher {
     private static List<String> buildRelaunchCommand() {
         ProcessHandle.Info info = ProcessHandle.current().info();
         String javaBin = info.command().orElseGet(ThinLauncher::defaultJavaBin);
-        String[] originalArgs = info.arguments().orElseGet(ThinLauncher::argsFromJavaCommand);
+        String[] originalArgs = info.arguments().orElseGet(DaemonPaths::argsFromJavaCommand);
 
         List<String> command = new ArrayList<>();
         command.add(javaBin);
@@ -123,21 +125,14 @@ public final class ThinLauncher {
         return System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
     }
 
-    /** Fallback when {@code ProcessHandle.Info.arguments()} isn't available on this platform. */
-    private static String[] argsFromJavaCommand() {
-        String sunJavaCommand = System.getProperty("sun.java.command", "");
-        String[] parts = sunJavaCommand.split("\\s+");
-        return parts.length <= 1 ? new String[0] : java.util.Arrays.copyOfRange(parts, 1, parts.length);
-    }
-
     private static boolean isWindows() {
         return System.getProperty("os.name", "").toLowerCase().contains("win");
     }
 
-    private static Socket waitForDaemon() {
+    private static Socket waitForDaemon(String key) {
         long deadline = System.currentTimeMillis() + STARTUP_TIMEOUT_MS;
         while (System.currentTimeMillis() < deadline) {
-            Socket socket = connectIfRunning();
+            Socket socket = connectIfRunning(key);
             if (socket != null) {
                 return socket;
             }
