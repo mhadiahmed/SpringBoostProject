@@ -10,7 +10,7 @@ plugins {
 // io.github.<username> convention: Sonatype's Central Portal verifies this
 // namespace automatically via GitHub, since we don't own springboost.com.
 group = 'io.github.mhadiahmed'
-version = '0.2.0-SNAPSHOT'
+version = '0.2.0'
 sourceCompatibility = '17'
 
 configurations {

@@ -15,7 +15,7 @@
          springboost.com domain that com.springboost would require. -->
     <groupId>io.github.mhadiahmed</groupId>
     <artifactId>spring-boost</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <name>Spring Boost</name>
     <description>MCP Server for AI-Assisted Spring Boot Development - The Laravel Boost equivalent for Spring Boot developers</description>
     <packaging>jar</packaging>
