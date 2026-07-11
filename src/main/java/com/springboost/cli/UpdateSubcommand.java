@@ -30,7 +30,7 @@ public class UpdateSubcommand implements Callable<Integer> {
     public Integer call() throws Exception {
         Path targetDir = Path.of(System.getProperty("user.dir"));
         var mode = discover ? GuidelinesPublisher.Mode.UPDATE_DISCOVER : GuidelinesPublisher.Mode.UPDATE;
-        var result = publisher.publish(targetDir, mode, false);
+        var result = publisher.publish(targetDir, mode, false, true);
 
         System.out.printf("Updated %d guideline/skill file(s) in %s/.ai%n",
                 result.written().size(), targetDir);

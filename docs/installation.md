@@ -36,7 +36,11 @@ gradle clean build
 gradle clean build -x test
 ```
 
-This produces `target/spring-boost-0.1.0.jar` — a self-contained executable jar.
+This produces two jars: `target/spring-boost-0.2.0-exec.jar` — the
+self-contained executable jar (use this for everything below) — and the
+classifier-less `target/spring-boost-0.2.0.jar`, a plain library jar with no
+`Main-Class`, meant only for the "Maven/Gradle dependency" case in the
+README's Option 3.
 
 ## Register the MCP Server (stdio)
 
@@ -45,7 +49,7 @@ editor session, spawned on demand, no port to open. From your Spring Boot
 project's root:
 
 ```bash
-java -jar /path/to/spring-boost-0.1.0.jar install
+java -jar /path/to/spring-boost-0.2.0-exec.jar install
 ```
 
 `install` publishes the AI guidelines/skills into your project's `.ai/`
@@ -53,7 +57,7 @@ directory and prints the exact registration command for your editor. For
 Claude Code specifically:
 
 ```bash
-claude mcp add -s local -t stdio spring-boost -- java -jar /path/to/spring-boost-0.1.0.jar mcp
+claude mcp add -s local -t stdio spring-boost -- java -jar /path/to/spring-boost-0.2.0-exec.jar mcp
 ```
 
 See [AI Client Setup](../README.md#-ai-client-setup) in the README for Codex, Gemini CLI, and Cursor equivalents.
@@ -61,12 +65,11 @@ See [AI Client Setup](../README.md#-ai-client-setup) in the README for Codex, Ge
 ## Running the Long-Running Server (optional)
 
 Spring Boost can also run as an always-on WebSocket server (e.g. inside
-Docker or as a dependency in your own app), separate from the stdio
-integration above:
+Docker), separate from the stdio integration above:
 
 ```bash
 # Run directly
-java -jar target/spring-boost-0.1.0.jar
+java -jar target/spring-boost-0.2.0-exec.jar
 
 # Or build and run in Docker
 docker build -t spring-boost .

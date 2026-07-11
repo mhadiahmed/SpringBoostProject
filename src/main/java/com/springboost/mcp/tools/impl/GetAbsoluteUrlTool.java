@@ -91,6 +91,21 @@ public class GetAbsoluteUrlTool implements McpTool {
     
     @Override
     public Object execute(Map<String, Object> params) throws McpToolException {
+        String customHost = (String) params.get("customHost");
+        Object customPortObj = params.get("customPort");
+        Integer customPort = customPortObj != null ? ((Number) customPortObj).intValue() : null;
+        boolean isStandalone = com.springboost.SpringBoostApplication.getCurrentMode()
+                == com.springboost.SpringBoostApplication.Mode.STANDALONE;
+
+        if (isStandalone && (customHost == null || customPort == null)) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("error", "get-absolute-url cannot auto-detect the target application's server in standalone mode");
+            result.put("mode", "standalone");
+            result.put("hint", "Provide customHost and customPort parameters to construct URLs manually. "
+                    + "Example: {\"relativePath\": \"/api/users\", \"customHost\": \"localhost\", \"customPort\": 8080}");
+            return result;
+        }
+
         try {
             String relativePath = (String) params.get("relativePath");
             if (relativePath == null) {
@@ -100,9 +115,6 @@ public class GetAbsoluteUrlTool implements McpTool {
             boolean includeContextPath = (boolean) params.getOrDefault("includeContextPath", true);
             boolean forceHttps = (boolean) params.getOrDefault("forceHttps", false);
             boolean forceHttp = (boolean) params.getOrDefault("forceHttp", false);
-            String customHost = (String) params.get("customHost");
-            Integer customPort = params.get("customPort") != null ? 
-                    ((Number) params.get("customPort")).intValue() : null;
             boolean includeAlternatives = (boolean) params.getOrDefault("includeAlternatives", false);
             
             if (forceHttps && forceHttp) {

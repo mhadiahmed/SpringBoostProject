@@ -72,6 +72,18 @@ public class DatabaseConnectionsTool implements McpTool {
     
     @Override
     public Object execute(Map<String, Object> params) throws McpToolException {
+        if (com.springboost.SpringBoostApplication.getCurrentMode()
+                == com.springboost.SpringBoostApplication.Mode.STANDALONE) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("error", "database-connections cannot inspect the target application's DataSource in standalone mode");
+            result.put("mode", "standalone");
+            result.put("hint", "This tool reports spring-boost's own H2 connection pool when run standalone, "
+                    + "not the target application's database connections. To inspect real connection pools, "
+                    + "either: (1) embed spring-boost as a dependency and run the WebSocket server inside "
+                    + "your app, or (2) use your app's /actuator/metrics/hikaricp* endpoints directly.");
+            return result;
+        }
+
         try {
             boolean includeMetadata = (boolean) params.getOrDefault("includeMetadata", true);
             boolean includePoolStats = (boolean) params.getOrDefault("includePoolStats", true);

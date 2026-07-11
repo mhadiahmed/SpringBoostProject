@@ -7,12 +7,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,16 +53,188 @@ public class DocumentationService {
     private static final Pattern JAVA_CODE_PATTERN = Pattern.compile("@[A-Za-z]+|public class|private|protected|import ");
     private static final Pattern CONFIG_PATTERN = Pattern.compile("(application\\.yml|application\\.properties|@Configuration)");
     
+    // Guideline indexing (151 chunks, each running regex extraction + a hash)
+    // costs several seconds -- too slow to pay unconditionally on every stdio
+    // MCP session boot, most of which never call search-docs at all. Deferred
+    // until the first actual access via ensureGuidelinesLoaded().
+    private volatile boolean guidelinesLoaded = false;
+
     @PostConstruct
     public void initialize() {
-        log.info("Initializing Documentation Service with {} sources", documentationSources.size());
-        
-        // For demo purposes, we'll create some sample documentation chunks
-        initializeSampleDocumentation();
+        log.info("Initializing Documentation Service with {} sources (guideline indexing deferred until first search)",
+                documentationSources.size());
+    }
+
+    /**
+     * Loads the bundled guideline corpus on first use, not at startup. Safe
+     * to call repeatedly -- a no-op after the first successful load.
+     */
+    private synchronized void ensureGuidelinesLoaded() {
+        if (guidelinesLoaded) {
+            return;
+        }
+        int loaded = initializeGuidelinesDocumentation();
+        if (loaded == 0) {
+            log.warn("No bundled guidelines found, falling back to sample documentation");
+            initializeSampleDocumentation();
+        }
+        guidelinesLoaded = true;
     }
     
     /**
-     * Initialize sample documentation for testing and demonstration
+     * Load the bundled .ai/guidelines/*.md files and index them as searchable
+     * documentation chunks. Each file becomes one or more chunks depending on
+     * its size (split at markdown headers).
+     */
+    private int initializeGuidelinesDocumentation() {
+        int indexed = 0;
+        try {
+            PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            Resource[] resources = resolver.getResources("classpath*:.ai/guidelines/**/*.md");
+            
+            for (Resource resource : resources) {
+                if (!resource.isReadable()) continue;
+                
+                try {
+                    String uri = resource.getURI().toString();
+                    // Extract the relative path like "guidelines/core/spring-boot.md"
+                    int idx = uri.indexOf(".ai/");
+                    String relativePath = idx >= 0 ? uri.substring(idx + 4) : resource.getFilename();
+                    
+                    String content = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                    String source = extractSourceFromPath(relativePath);
+                    String version = extractVersionFromPath(relativePath);
+                    String category = extractCategoryFromPath(relativePath);
+                    
+                    // Split large files into chunks at markdown headers (## level)
+                    List<String> chunks = splitIntoChunks(content, 2000);
+                    
+                    int chunkIndex = 0;
+                    for (String chunkContent : chunks) {
+                        if (chunkContent.trim().length() < 50) continue;
+                        
+                        String title = extractTitleFromContent(chunkContent, relativePath, chunkIndex);
+                        DocumentChunk chunk = createSampleChunk(
+                                title, chunkContent.trim(),
+                                "bundled://" + relativePath,
+                                source, version, category);
+                        chunk.setTags(extractTagsFromPath(relativePath));
+                        indexDocument(chunk);
+                        indexed++;
+                        chunkIndex++;
+                    }
+                } catch (IOException e) {
+                    log.warn("Failed to read guideline file {}: {}", resource.getFilename(), e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to scan for bundled guidelines: {}", e.getMessage());
+        }
+        
+        log.info("Indexed {} chunks from bundled .ai/guidelines", indexed);
+        return indexed;
+    }
+    
+    /**
+     * Split content into chunks of roughly maxChunkSize characters,
+     * breaking at markdown header boundaries (## or ###).
+     */
+    private List<String> splitIntoChunks(String content, int maxChunkSize) {
+        List<String> chunks = new ArrayList<>();
+        String[] lines = content.split("\n");
+        StringBuilder current = new StringBuilder();
+        
+        for (String line : lines) {
+            // If adding this line would exceed the limit AND we have content, flush
+            if (current.length() > 0 && current.length() + line.length() > maxChunkSize
+                    && (line.startsWith("## ") || line.startsWith("### ") || line.startsWith("# "))) {
+                chunks.add(current.toString());
+                current = new StringBuilder();
+            }
+            current.append(line).append("\n");
+        }
+        
+        if (current.length() > 0) {
+            chunks.add(current.toString());
+        }
+        
+        return chunks;
+    }
+    
+    private String extractTitleFromContent(String content, String relativePath, int chunkIndex) {
+        // Try to find a markdown heading
+        String[] lines = content.split("\n");
+        for (String line : lines) {
+            String trimmed = line.trim();
+            if (trimmed.startsWith("# ")) {
+                return trimmed.substring(2).trim();
+            }
+            if (trimmed.startsWith("## ")) {
+                return trimmed.substring(3).trim();
+            }
+        }
+        // Fallback to filename
+        String filename = relativePath.contains("/") ? relativePath.substring(relativePath.lastIndexOf('/') + 1) : relativePath;
+        filename = filename.replace(".md", "").replace("-", " ");
+        if (chunkIndex > 0) {
+            filename += " (part " + (chunkIndex + 1) + ")";
+        }
+        return filename;
+    }
+    
+    private String extractSourceFromPath(String relativePath) {
+        // "guidelines/core/spring-boot.md" -> "spring-boot-core"
+        // "guidelines/spring-boot/3.x/core.md" -> "spring-boot-3.x"
+        String path = relativePath.replace("guidelines/", "");
+        String[] parts = path.split("/");
+        if (parts.length >= 2) {
+            return parts[0] + "-" + parts[1];
+        }
+        return parts[0].replace(".md", "");
+    }
+    
+    private String extractVersionFromPath(String relativePath) {
+        if (relativePath.contains("/3.x/")) return "3.x";
+        if (relativePath.contains("/2.x/")) return "2.x";
+        if (relativePath.contains("/6.x/")) return "6.x";
+        if (relativePath.contains("/5.x/")) return "5.x";
+        if (relativePath.contains("/2023.x/")) return "2023.x";
+        if (relativePath.contains("/2022.x/")) return "2022.x";
+        return "current";
+    }
+    
+    private String extractCategoryFromPath(String relativePath) {
+        if (relativePath.contains("/core/")) return "core";
+        if (relativePath.contains("/ecosystem/")) return "ecosystem";
+        if (relativePath.contains("/spring-boot/")) return "spring-boot";
+        if (relativePath.contains("/spring-cloud/")) return "cloud";
+        if (relativePath.contains("/spring-security/")) return "security";
+        if (relativePath.contains("/spring-data/")) return "data";
+        return "general";
+    }
+    
+    private List<String> extractTagsFromPath(String relativePath) {
+        List<String> tags = new ArrayList<>();
+        String lower = relativePath.toLowerCase();
+        if (lower.contains("spring-boot")) tags.add("spring-boot");
+        if (lower.contains("spring-security")) tags.add("spring-security");
+        if (lower.contains("spring-data")) tags.add("spring-data");
+        if (lower.contains("spring-cloud")) tags.add("spring-cloud");
+        if (lower.contains("database")) tags.add("database");
+        if (lower.contains("docker")) tags.add("docker");
+        if (lower.contains("kubernetes") || lower.contains("k8s")) tags.add("kubernetes");
+        if (lower.contains("messaging") || lower.contains("kafka")) tags.add("messaging");
+        if (lower.contains("monitoring") || lower.contains("observability")) tags.add("monitoring");
+        if (lower.contains("testing")) tags.add("testing");
+        if (lower.contains("security")) tags.add("security");
+        if (lower.contains("web")) tags.add("web");
+        if (tags.isEmpty()) tags.add("spring-boot");
+        return tags;
+    }
+    
+    /**
+     * Initialize sample documentation for testing and demonstration.
+     * Used as a fallback when bundled guidelines are not available.
      */
     private void initializeSampleDocumentation() {
         List<DocumentChunk> sampleChunks = List.of(
@@ -111,7 +287,7 @@ public class DocumentationService {
             indexDocument(chunk);
         }
         
-        log.info("Initialized {} sample documentation chunks", sampleChunks.size());
+        log.info("Initialized {} fallback sample documentation chunks (no bundled guidelines found)", sampleChunks.size());
     }
     
     /**
@@ -454,13 +630,15 @@ public class DocumentationService {
      * Get all indexed documents
      */
     public Collection<DocumentChunk> getAllDocuments() {
+        ensureGuidelinesLoaded();
         return documentIndex.values();
     }
-    
+
     /**
      * Get document by ID
      */
     public Optional<DocumentChunk> getDocumentById(String id) {
+        ensureGuidelinesLoaded();
         return Optional.ofNullable(documentIndex.get(id));
     }
     
@@ -468,6 +646,7 @@ public class DocumentationService {
      * Get documents by source
      */
     public List<DocumentChunk> getDocumentsBySource(String source) {
+        ensureGuidelinesLoaded();
         return documentIndex.values().stream()
                 .filter(chunk -> source.equals(chunk.getSource()))
                 .toList();
@@ -486,6 +665,7 @@ public class DocumentationService {
      * Get index statistics
      */
     public Map<String, Object> getIndexStats() {
+        ensureGuidelinesLoaded();
         Map<String, Long> sourceStats = documentIndex.values().stream()
                 .collect(Collectors.groupingBy(
                         DocumentChunk::getSource,

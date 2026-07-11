@@ -52,6 +52,12 @@ public class BoostCommand implements Callable<Integer>, CommandLineRunner {
         description = "Validate configuration and exit"
     )
     private boolean validateConfig;
+
+    @CommandLine.Option(
+        names = {"-q", "--quiet"},
+        description = "Suppress non-essential boot logs for CLI subcommands"
+    )
+    private boolean quiet;
     
     @Autowired
     private McpToolRegistry toolRegistry;
@@ -77,7 +83,7 @@ public class BoostCommand implements Callable<Integer>, CommandLineRunner {
         // long-running server (WebSocket, port 8080/28080) and should keep running.
         if (args.length > 0) {
             CommandLine cmd = new CommandLine(this);
-            cmd.addSubcommand("mcp", new McpSubcommand(messageProcessor, objectMapper));
+            cmd.addSubcommand("mcp-daemon", new McpDaemonSubcommand(messageProcessor, objectMapper));
             cmd.addSubcommand("install", new InstallSubcommand(guidelinesPublisher));
             cmd.addSubcommand("update", new UpdateSubcommand(guidelinesPublisher));
             int exitCode = cmd.execute(args);

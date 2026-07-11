@@ -80,6 +80,19 @@ public class ApplicationInfoTool implements McpTool {
     
     @Override
     public Object execute(Map<String, Object> params) throws McpToolException {
+        if (com.springboost.SpringBoostApplication.getCurrentMode()
+                == com.springboost.SpringBoostApplication.Mode.STANDALONE) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("error", "application-info cannot introspect the target application in standalone mode");
+            result.put("mode", "standalone");
+            result.put("hint", "This tool reports spring-boost's own internal state when run as a standalone "
+                    + "JVM (java -jar spring-boost.jar mcp), which is not the target application. "
+                    + "To get real application info, either: (1) embed spring-boost as a Maven/Gradle "
+                    + "dependency and run the WebSocket server inside your app, or (2) use your app's "
+                    + "own /actuator/info endpoint instead.");
+            return result;
+        }
+
         try {
             boolean includeJvm = (boolean) params.getOrDefault("includeJvm", true);
             boolean includeBeans = (boolean) params.getOrDefault("includeBeans", false);

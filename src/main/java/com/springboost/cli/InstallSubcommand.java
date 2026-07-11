@@ -21,6 +21,9 @@ public class InstallSubcommand implements Callable<Integer> {
     @CommandLine.Option(names = "--force", description = "Overwrite guideline/skill files already published in this project")
     private boolean force;
 
+    @CommandLine.Option(names = "--all", description = "Publish all guidelines regardless of detected project dependencies")
+    private boolean all;
+
     public InstallSubcommand(GuidelinesPublisher publisher) {
         this.publisher = publisher;
     }
@@ -28,12 +31,20 @@ public class InstallSubcommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         Path targetDir = Path.of(System.getProperty("user.dir"));
-        var result = publisher.publish(targetDir, GuidelinesPublisher.Mode.INSTALL, force);
+
+        if (!all) {
+            var detected = GuidelinesPublisher.detectRelevantCategories(targetDir);
+            if (detected != null) {
+                System.out.printf("Detected project dependencies — publishing relevant guidelines only (use --all for everything)%n");
+            }
+        }
+
+        var result = publisher.publish(targetDir, GuidelinesPublisher.Mode.INSTALL, force, all);
 
         System.out.printf("Published %d guideline/skill file(s) to %s/.ai%n",
                 result.written().size(), targetDir);
         if (!result.skipped().isEmpty()) {
-            System.out.printf("Skipped %d already-present file(s) (use --force to overwrite)%n",
+            System.out.printf("Skipped %d file(s) (not relevant to this project, or already present; use --force/--all to override)%n",
                     result.skipped().size());
         }
 

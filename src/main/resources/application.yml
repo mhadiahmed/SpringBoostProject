@@ -74,15 +74,15 @@ spring-boost:
       spring-boot:
         enabled: true
         base-url: "https://docs.spring.io/spring-boot/docs/current/reference/html/"
-        version: "3.2.0"
+        version: "3.5.0"
       spring-security:
         enabled: true
         base-url: "https://docs.spring.io/spring-security/reference/"
-        version: "6.1.0"
+        version: "6.4.0"
       spring-data:
         enabled: true
         base-url: "https://docs.spring.io/spring-data/jpa/docs/current/reference/html/"
-        version: "3.1.0"
+        version: "3.4.0"
     search:
       default-max-results: 10
       min-relevance-score: 0.1

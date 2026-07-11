@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.0'
+    id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'maven-publish'
     id 'signing'
@@ -10,7 +10,7 @@ plugins {
 // io.github.<username> convention: Sonatype's Central Portal verifies this
 // namespace automatically via GitHub, since we don't own springboost.com.
 group = 'io.github.mhadiahmed'
-version = '0.1.0'
+version = '0.2.0-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
@@ -202,14 +202,14 @@ task startMcpServer(type: JavaExec) {
     ]
 }
 
-// Fat JAR configuration
-jar {
-    enabled = false
-    dependsOn(bootJar)
-}
-
+// The plain `jar` task (classes at root) is now the main artifact so
+// `implementation 'io.github.mhadiahmed:spring-boost'` works as a normal
+// library dependency; `bootJar` (below) is the separate executable,
+// classifier'd 'exec' artifact used for `java -jar ... mcp`.
 bootJar {
-    archiveClassifier = ''
+    // See pom.xml's spring-boot-maven-plugin <classifier> comment: without this,
+    // the executable jar replaces the main artifact and breaks library consumers.
+    archiveClassifier = 'exec'
     manifest {
         attributes(
             'Implementation-Title': project.name,

@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.mhadiahmed/spring-boost.svg)](https://central.sonatype.com/artifact/io.github.mhadiahmed/spring-boost)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/mhadiahmed/SpringBoostProject/ci.yml?branch=main)](https://github.com/mhadiahmed/SpringBoostProject/actions)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.oracle.com/java/)
 
 > Published on Maven Central as `io.github.mhadiahmed:spring-boost`. Not yet on Docker Hub — download the jar from [GitHub Releases](https://github.com/mhadiahmed/SpringBoostProject/releases), pull from Maven Central (see below), or build from source.
@@ -38,33 +38,45 @@ cd SpringBoostProject
 mvn clean package -DskipTests
 ```
 
-This produces `target/spring-boost-0.1.0.jar`.
+This produces `target/spring-boost-0.2.0-exec.jar` — the executable jar (the
+classifier-less `target/spring-boost-0.2.0.jar` is a plain library jar with no
+`Main-Class`; see Option 3 below).
 
 ### Then, from your Spring Boot project's root
 
 Publish the AI guidelines/skills and get your editor's registration command:
 
 ```bash
-java -jar /path/to/spring-boost-0.1.0.jar install
+java -jar /path/to/spring-boost-0.2.0-exec.jar install
 ```
 
 `install` prints the exact registration command for your editor (Claude Code, Cursor, Codex, Gemini CLI) — see [AI Client Setup](#-ai-client-setup) below.
 
-### Option 3: Maven/Gradle dependency
+### Option 3: Maven/Gradle dependency (embed in your own app)
 
-If you want to embed the long-running WebSocket server mode inside your own Spring Boot application rather than run the standalone jar:
+Adding spring-boost as a dependency auto-configures the MCP tool registry and
+`/mcp` WebSocket endpoint inside your own app's Spring context (`IN_PROCESS`
+mode) — so `application-info`, `database-schema`, etc. see your app's real
+beans/DataSource instead of an honest "standalone, can't see your app" error.
+Disable it with `spring-boost.mcp.enabled=false` if you don't want this.
 
 ```xml
 <dependency>
     <groupId>io.github.mhadiahmed</groupId>
     <artifactId>spring-boost</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
 ```gradle
-implementation 'io.github.mhadiahmed:spring-boost:0.1.0'
+implementation 'io.github.mhadiahmed:spring-boost:0.2.0'
 ```
+
+> Note: this only works from v0.2.0 onward. v0.1.0 was published as Spring
+> Boot's repackaged executable jar (classes under `BOOT-INF/classes/`), which
+> a normal classloader can't resolve as a library dependency at all — v0.2.0
+> splits the executable jar out to its own `exec` classifier so the
+> classifier-less artifact is a normal, classes-at-root library jar.
 
 ## 🛠️ Available MCP Tools
 
@@ -234,7 +246,7 @@ gradle build
 mvn test
 
 # Run the long-running WebSocket server (no args = default server mode)
-java -jar target/spring-boost-0.1.0.jar
+java -jar target/spring-boost-0.2.0-exec.jar
 ```
 
 ### Running Tests

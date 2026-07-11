@@ -17,7 +17,8 @@ COPY src ./src
 COPY .ai ./.ai
 
 # Build the application. Skip sources/javadoc jars (only needed for Maven
-# Central publishing) so target/ has a single unambiguous spring-boost-*.jar.
+# Central publishing). target/ now has two jars: the plain library jar and
+# the executable spring-boost-*-exec.jar (see pom.xml's <classifier> comment).
 RUN mvn clean package -DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true
 
 # Production stage
@@ -39,8 +40,9 @@ RUN groupadd springboost && \
 # Set working directory
 WORKDIR /app
 
-# Copy the built jar from builder stage
-COPY --from=builder /app/target/spring-boost-*.jar app.jar
+# Copy the built executable jar from builder stage (the classifier-less jar
+# in target/ is the plain library artifact, not runnable — see pom.xml)
+COPY --from=builder /app/target/spring-boost-*-exec.jar app.jar
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/config /app/data && \

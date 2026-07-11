@@ -104,6 +104,18 @@ public class DatabaseQueryTool implements McpTool {
     
     @Override
     public Object execute(Map<String, Object> params) throws McpToolException {
+        if (com.springboost.SpringBoostApplication.getCurrentMode()
+                == com.springboost.SpringBoostApplication.Mode.STANDALONE) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("error", "database-query cannot execute queries against the target application's database in standalone mode");
+            result.put("mode", "standalone");
+            result.put("hint", "This tool would execute queries against spring-boost's own internal H2 database "
+                    + "when run standalone, not the target application's database. To query real data, "
+                    + "either: (1) embed spring-boost as a dependency and run the WebSocket server inside "
+                    + "your app, or (2) use your application's own data access layer directly.");
+            return result;
+        }
+
         try {
             String query = (String) params.get("query");
             if (query == null || query.trim().isEmpty()) {

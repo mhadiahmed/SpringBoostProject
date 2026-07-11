@@ -85,6 +85,18 @@ public class DatabaseSchemaTool implements McpTool {
     
     @Override
     public Object execute(Map<String, Object> params) throws McpToolException {
+        if (com.springboost.SpringBoostApplication.getCurrentMode()
+                == com.springboost.SpringBoostApplication.Mode.STANDALONE) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("error", "database-schema cannot introspect the target application's database in standalone mode");
+            result.put("mode", "standalone");
+            result.put("hint", "This tool inspects spring-boost's own internal H2 database when run standalone, "
+                    + "not the target application's schema. To inspect your real database, either: "
+                    + "(1) embed spring-boost as a dependency and run the WebSocket server inside your app, "
+                    + "or (2) use your app's /actuator/env or JPA metadata directly.");
+            return result;
+        }
+
         try {
             boolean includeColumns = (boolean) params.getOrDefault("includeColumns", true);
             boolean includeIndexes = (boolean) params.getOrDefault("includeIndexes", true);

@@ -24,7 +24,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(mcpServer, "/mcp")
-                .setAllowedOrigins("*") // In production, restrict this to specific origins
+                // setAllowedOrigins("*") is rejected at request time: SockJS defaults
+                // to allowCredentials (session cookie), and a literal "*" origin can't
+                // be combined with credentialed CORS. Patterns are evaluated
+                // per-request instead of emitted literally, so this is spec-legal.
+                .setAllowedOriginPatterns("*") // In production, restrict this to specific origins
                 .withSockJS(); // Enable SockJS fallback
     }
 }
