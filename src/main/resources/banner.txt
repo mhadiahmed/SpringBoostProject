@@ -5,4 +5,4 @@
   ███████║██║     ██║  ██║██║██║ ╚████║╚██████╔╝    ██████╔╝╚██████╔╝╚██████╔╝███████║   ██║   
   ╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝   ╚═╝   
                                                                                                    
-  :: MCP Server for AI-Assisted Spring Boot Development ::                    Version: 0.1.0
+  :: MCP Server for AI-Assisted Spring Boot Development ::                    Version: ${application.version:dev}

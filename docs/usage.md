@@ -26,10 +26,9 @@ stdio registration — they're independent).
 
 ## Standalone setup (recommended starting point)
 
-1. **Get the executable jar.** GitHub Releases currently only has v0.1.0
-   (known-broken, don't use it — see [KNOWN_ISSUES.md](../KNOWN_ISSUES.md)),
-   so for now either build from source (see [installation.md](installation.md))
-   or pull the `-exec` classifier straight from Maven Central:
+1. **Get the executable jar** from the
+   [v0.2.0 GitHub Release](https://github.com/mhadiahmed/SpringBoostProject/releases/tag/v0.2.0),
+   or pull it straight from Maven Central:
 
    ```bash
    mvn dependency:get -Dartifact=io.github.mhadiahmed:spring-boost:0.2.0:jar:exec
@@ -188,9 +187,6 @@ and that `spring-boost.mcp.enabled` isn't set to `false`.
 
 Honest assessment of what's still worth doing, roughly in priority order:
 
-0. **Cut a real v0.2.0 GitHub Release.** Right now GitHub Releases only has
-   the broken v0.1.0 jar; anyone following that link gets the old bugs back.
-   Low effort, high impact — do this before anything else below.
 1. **CLI boot-noise cleanup** (tracked as issue #5 in
    [KNOWN_ISSUES.md](../KNOWN_ISSUES.md)) — `install`/`update` still print
    ~27 lines of Spring/Hibernate boot chatter before the real output.

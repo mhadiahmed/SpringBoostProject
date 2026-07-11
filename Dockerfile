@@ -76,7 +76,7 @@ ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 # Labels for metadata
 LABEL org.opencontainers.image.title="Spring Boost"
 LABEL org.opencontainers.image.description="MCP Server for AI-Assisted Spring Boot Development"
-LABEL org.opencontainers.image.version="0.1.0"
+LABEL org.opencontainers.image.version="0.2.0"
 LABEL org.opencontainers.image.url="https://github.com/mhadiahmed/SpringBoostProject"
 LABEL org.opencontainers.image.source="https://github.com/mhadiahmed/SpringBoostProject"
 LABEL org.opencontainers.image.licenses="MIT"

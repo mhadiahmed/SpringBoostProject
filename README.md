@@ -23,16 +23,11 @@
 
 ## 🚀 Quick Start
 
-> ⚠️ The GitHub Releases page currently only has **v0.1.0**, which has known
-> bugs fixed in v0.2.0 (see [KNOWN_ISSUES.md](KNOWN_ISSUES.md)) — don't use
-> it. Until a v0.2.0 GitHub Release exists, build from source (Option 2) or
-> pull straight from Maven Central (Option 3, for embedding).
-
 ### Option 1: Download the release jar
 
 ```bash
 curl -L -o spring-boost.jar \
-  https://github.com/mhadiahmed/SpringBoostProject/releases/download/v0.1.0/spring-boost-0.1.0.jar
+  https://github.com/mhadiahmed/SpringBoostProject/releases/download/v0.2.0/spring-boost-0.2.0-exec.jar
 ```
 
 ### Option 2: Build from source (requires Java 17+ and Maven)
